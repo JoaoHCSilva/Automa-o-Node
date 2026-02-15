@@ -1,13 +1,17 @@
-﻿# templateNodeApp
+﻿# Automação Node
 
 ## Descricao
 
-Descreva aqui o objetivo do seu projeto PowerShell.
+ Projeto de automação de criação de pastas e arquivos de um projeto nodejs, a ideia surguiu, pois como eu sempre me embolava
+ ao iniciar meus projetos node, eu resolvi criar um script para automatizar esse processo. Fique a vontade para subir 
+ uma issue ou pull request com alguma melhoria, ainda tem muito o que melhorar neste projeto, porém isso vou pensando ao decorrer
+ das semanas ou quando a necessidade surgir :p
 
 ## Pre-requisitos
 
-- PowerShell 5.1 ou superior
-- [Liste aqui outras dependencias necessarias]
+- PowerShell 5.1 ou superior (Recomendado PowerShell 7.4 ou superior)
+- Privilégios para criar pastas e arquivos
+- Node.js 20.11.1 ou superior (Recomendado Node.js 22.12.0 ou superior)
 
 ## Como Executar
 
@@ -25,17 +29,15 @@ build.bat
 ## Estrutura do Projeto
 
 ```
-templateNodeApp/
-â”œâ”€â”€ main.ps1       # Script principal
-â”œâ”€â”€ build.bat      # Arquivo para execucao rapida
-â”œâ”€â”€ README.md      # Documentacao do projeto
-â””â”€â”€ .gitignore     # Arquivos ignorados pelo Git
+AutomacaoNode/
+|__assets/          # Arquivos de configuracao
+|__dist/            # Arquivos gerados
+|__src/             # Arquivos de configuracao
+|__README.md        # Documentacao do projeto
+|__.gitignore       # Arquivos ignorados pelo Git
+|__templateNodeApp/ # Template de projeto nodejs
 ```
 
 ## Autor
 
-Seu Nome - [seu-email@exemplo.com]
-
-## Licenca
-
-Este projeto esta licenciado sob a licenca MIT.
+João Henrique - [joaohh41@hotmail.com]
