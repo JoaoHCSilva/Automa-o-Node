@@ -13,7 +13,12 @@ function installDependencies {
     
     Write-Host "Instalando dependencias de producao..." -ForegroundColor Yellow
     Write-Host "  express, dotenv, cors, jsonwebtoken, bcrypt, express-validator, express-rate-limit, winston" -ForegroundColor Gray
-    npm install $depProducao
+    $npmCmd = (Get-Command npm -ErrorAction SilentlyContinue).Source
+    if ($npmCmd) {
+        Start-Process -FilePath $npmCmd -ArgumentList "install $($depProducao -join ' ')" -NoNewWindow -Wait
+    } else {
+        npm install $depProducao
+    }
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Erro ao instalar dependências de producao!" -ForegroundColor Red
@@ -22,7 +27,11 @@ function installDependencies {
     
     Write-Host "Instalando dependencias de desenvolvimento..." -ForegroundColor Yellow
     Write-Host "  nodemon, typescript, @types/*, concurrently" -ForegroundColor Gray
-    npm install --save-dev $depDesenvolvimento
+    if ($npmCmd) {
+        Start-Process -FilePath $npmCmd -ArgumentList "install --save-dev $($depDesenvolvimento -join ' ')" -NoNewWindow -Wait
+    } else {
+        npm install --save-dev $depDesenvolvimento
+    }
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Erro ao instalar dependências de desenvolvimento!" -ForegroundColor Red

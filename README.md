@@ -2,10 +2,10 @@
 
 ## Descricao
 
- Projeto de automação de criação de pastas e arquivos de um projeto nodejs, a ideia surguiu, pois como eu sempre me embolava
- ao iniciar meus projetos node, eu resolvi criar um script para automatizar esse processo. Fique a vontade para subir 
- uma issue ou pull request com alguma melhoria, ainda tem muito o que melhorar neste projeto, porém isso vou pensando ao decorrer
- das semanas ou quando a necessidade surgir :p
+Projeto de automação de criação de pastas e arquivos de um projeto nodejs, a ideia surguiu, pois como eu sempre me embolava
+ao iniciar meus projetos node, eu resolvi criar um script para automatizar esse processo. Fique a vontade para subir
+uma issue ou pull request com alguma melhoria, ainda tem muito o que melhorar neste projeto, porém isso vou pensando ao decorrer
+das semanas ou quando a necessidade surgir :p
 
 ## Pre-requisitos
 
@@ -16,14 +16,17 @@
 ## Como Executar
 
 ### Opcao 1: Via PowerShell
+
 ```powershell
 .\main.ps1
 ```
 
-### Opcao 2: Via arquivo .bat
-Clique duas vezes no arquivo `build.bat` ou execute no terminal:
-```cmd
-build.bat
+### Opcao 2: Via release
+
+Baixe o arquivo `TemplateNodeAppGUI.exe` abaixo para instalar.
+
+```
+https://github.com/JoaoHCSilva/Automa-o-Node/releases
 ```
 
 ## Estrutura do Projeto

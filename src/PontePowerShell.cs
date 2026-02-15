@@ -52,7 +52,7 @@ namespace TemplateNodeAppGUI
                     var startInfo = new ProcessStartInfo
                     {
                         FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"{EscapeForCmd(scriptWrapper)}\"",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command \"{EscapeForCmd(scriptWrapper)}\"",
                         UseShellExecute = false,          // Necessário para capturar saída
                         RedirectStandardOutput = true,    // Captura stdout
                         RedirectStandardError = true,     // Captura stderr
@@ -116,10 +116,36 @@ namespace TemplateNodeAppGUI
             string extensaoEscolhida = linguagem >= 0 && linguagem < extensoes.Length ? extensoes[linguagem] : "js";
 
             // Script PowerShell que replica a lógica do main.ps1 usando os parâmetros da GUI
+            // Usa uma função auxiliar Run-Quietly para executar npm/node sem abrir janela do console
             return $@"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 $PSDefaultParameterValues['*:Encoding'] = 'utf8'
+
+# Função auxiliar que executa comandos externos sem abrir janela do console
+function Run-Quietly {{
+    param([string]$Comando, [string]$Argumentos, [string]$Dir)
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = $Comando
+    $psi.Arguments = $Argumentos
+    $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+    if ($Dir) {{ $psi.WorkingDirectory = $Dir }}
+    $proc = [System.Diagnostics.Process]::Start($psi)
+    $stdout = $proc.StandardOutput.ReadToEnd()
+    $stderr = $proc.StandardError.ReadToEnd()
+    $proc.WaitForExit()
+    if ($stdout) {{ Write-Host $stdout }}
+    if ($stderr -and $proc.ExitCode -ne 0) {{ Write-Host $stderr }}
+    return $proc.ExitCode
+}}
+
+# Descobre o caminho completo do npm e node para evitar janela do cmd
+$npmPath = (Get-Command npm -ErrorAction SilentlyContinue).Source
+$nodePath = (Get-Command node -ErrorAction SilentlyContinue).Source
 
 $scriptDir = '{modulePath.Replace("\\\\", "\\")}'
 $modulePath = $scriptDir
@@ -138,20 +164,18 @@ $templateEscolhido = '{templateEscolhido}'
 
 Write-Host 'Verificando pre-requisitos...' -ForegroundColor Cyan
 
-$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
-if (-not $nodeCmd) {{
+if (-not $nodePath) {{
     Write-Host '[ERRO] Node.js nao esta instalado.' -ForegroundColor Red
     exit 1
 }}
-$nodeVersion = (node --version) -replace 'v', ''
+$nodeVersion = (& $nodePath --version) -replace 'v', ''
 Write-Host ""  [OK] Node.js v$nodeVersion"" -ForegroundColor Green
 
-$npmCmd = Get-Command npm -ErrorAction SilentlyContinue
-if (-not $npmCmd) {{
+if (-not $npmPath) {{
     Write-Host '[ERRO] npm nao esta instalado.' -ForegroundColor Red
     exit 1
 }}
-$npmVersion = npm --version
+$npmVersion = & $npmPath --version
 Write-Host ""  [OK] npm v$npmVersion"" -ForegroundColor Green
 
 if (-not (Test-Path -Path $caminho)) {{

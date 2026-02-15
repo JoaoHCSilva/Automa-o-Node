@@ -1,0 +1,49 @@
+# Workflow para buildar e publicar o TemplateNodeApp como GitHub Release
+# Acionado quando uma tag no formato v* é criada (ex: v1.0.0)
+
+name: Build e Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publicar aplicação
+        run: dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+
+      - name: Criar GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Template Node App ${{ github.ref_name }}
+          body: |
+            ## Template Node App ${{ github.ref_name }}
+
+            ### Download
+            Baixe o arquivo `TemplateNodeAppGUI.exe` abaixo para instalar.
+
+            ### Requisitos
+            - Windows 10/11 (64-bit)
+            - Node.js instalado
+            - npm instalado
+
+            > **Nota:** O .NET runtime já está incluído no executável, não é necessário instalar separadamente.
+          draft: false
+          prerelease: false
+          files: |
+            bin/Release/net8.0-windows/win-x64/publish/TemplateNodeAppGUI.exe
