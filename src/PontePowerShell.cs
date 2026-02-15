@@ -44,15 +44,22 @@ namespace TemplateNodeAppGUI
             // Isso evita o problema de Read-Host que pede input interativo
             string scriptWrapper = GerarScriptWrapper(nomeProjeto, caminho, linguagem, template);
 
+            // Salva o script em um arquivo temporário para evitar problemas com
+            // caracteres especiais e limites de tamanho na linha de comando
+            string tempScript = Path.Combine(Path.GetTempPath(), $"TemplateNodeApp_{Guid.NewGuid():N}.ps1");
+
             await Task.Run(() =>
             {
                 try
                 {
-                    // Configura o processo PowerShell
+                    // Escreve o script no arquivo temporário
+                    File.WriteAllText(tempScript, scriptWrapper, System.Text.Encoding.UTF8);
+
+                    // Configura o processo PowerShell para executar o arquivo de script
                     var startInfo = new ProcessStartInfo
                     {
                         FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command \"{EscapeForCmd(scriptWrapper)}\"",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File \"{tempScript}\"",
                         UseShellExecute = false,          // Necessário para capturar saída
                         RedirectStandardOutput = true,    // Captura stdout
                         RedirectStandardError = true,     // Captura stderr
@@ -95,6 +102,11 @@ namespace TemplateNodeAppGUI
                     OnOutput?.Invoke($"[ERRO FATAL] {ex.Message}");
                     OnFinished?.Invoke(false);
                 }
+                finally
+                {
+                    // Remove o arquivo temporário
+                    try { File.Delete(tempScript); } catch { }
+                }
             });
         }
 
@@ -116,36 +128,11 @@ namespace TemplateNodeAppGUI
             string extensaoEscolhida = linguagem >= 0 && linguagem < extensoes.Length ? extensoes[linguagem] : "js";
 
             // Script PowerShell que replica a lógica do main.ps1 usando os parâmetros da GUI
-            // Usa uma função auxiliar Run-Quietly para executar npm/node sem abrir janela do console
+            // Agora é salvo em arquivo .ps1 temporário, então não precisa de escape especial
             return $@"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 $PSDefaultParameterValues['*:Encoding'] = 'utf8'
-
-# Função auxiliar que executa comandos externos sem abrir janela do console
-function Run-Quietly {{
-    param([string]$Comando, [string]$Argumentos, [string]$Dir)
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = $Comando
-    $psi.Arguments = $Argumentos
-    $psi.UseShellExecute = $false
-    $psi.CreateNoWindow = $true
-    $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError = $true
-    $psi.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-    if ($Dir) {{ $psi.WorkingDirectory = $Dir }}
-    $proc = [System.Diagnostics.Process]::Start($psi)
-    $stdout = $proc.StandardOutput.ReadToEnd()
-    $stderr = $proc.StandardError.ReadToEnd()
-    $proc.WaitForExit()
-    if ($stdout) {{ Write-Host $stdout }}
-    if ($stderr -and $proc.ExitCode -ne 0) {{ Write-Host $stderr }}
-    return $proc.ExitCode
-}}
-
-# Descobre o caminho completo do npm e node para evitar janela do cmd
-$npmPath = (Get-Command npm -ErrorAction SilentlyContinue).Source
-$nodePath = (Get-Command node -ErrorAction SilentlyContinue).Source
 
 $scriptDir = '{modulePath.Replace("\\\\", "\\")}'
 $modulePath = $scriptDir
@@ -164,18 +151,20 @@ $templateEscolhido = '{templateEscolhido}'
 
 Write-Host 'Verificando pre-requisitos...' -ForegroundColor Cyan
 
-if (-not $nodePath) {{
+$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+if (-not $nodeCmd) {{
     Write-Host '[ERRO] Node.js nao esta instalado.' -ForegroundColor Red
     exit 1
 }}
-$nodeVersion = (& $nodePath --version) -replace 'v', ''
+$nodeVersion = (node --version) -replace 'v', ''
 Write-Host ""  [OK] Node.js v$nodeVersion"" -ForegroundColor Green
 
-if (-not $npmPath) {{
+$npmCmd = Get-Command npm -ErrorAction SilentlyContinue
+if (-not $npmCmd) {{
     Write-Host '[ERRO] npm nao esta instalado.' -ForegroundColor Red
     exit 1
 }}
-$npmVersion = & $npmPath --version
+$npmVersion = npm --version
 Write-Host ""  [OK] npm v$npmVersion"" -ForegroundColor Green
 
 if (-not (Test-Path -Path $caminho)) {{
@@ -237,17 +226,6 @@ Write-Host ""Localizacao: $caminhoCompleto""
 Write-Host ""Linguagem: $extensaoEscolhida""
 Write-Host ""Template: $templateEscolhido""
 ";
-        }
-
-        /// <summary>
-        /// Escapa caracteres especiais para passar o script via linha de comando.
-        /// </summary>
-        private static string EscapeForCmd(string script)
-        {
-            return script
-                .Replace("\"", "\\\"")
-                .Replace("\r\n", " ; ")
-                .Replace("\n", " ; ");
         }
     }
 }

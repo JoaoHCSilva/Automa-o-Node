@@ -37,12 +37,7 @@ function instalarVite {
     # navega para o diretório dos arquivos temporarios
     Set-Location $pastaTemporaria
     # inicia o projeto com template especificado (sem interação)
-    $npmCmd = (Get-Command npm -ErrorAction SilentlyContinue).Source
-    if ($npmCmd) {
-        Start-Process -FilePath $npmCmd -ArgumentList "create vite@latest $nomeDoProjeto -y -- --template $template --no-interactive" -NoNewWindow -Wait
-    } else {
-        npm create vite@latest $nomeDoProjeto -y -- --template $template --no-interactive
-    }
+    npm create vite@latest $nomeDoProjeto -y -- --template $template --no-interactive
 
     $origem = ".\$nomeDoProjeto"
     $destino = "..\"
