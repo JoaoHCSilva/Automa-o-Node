@@ -4,6 +4,12 @@
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>TemplateNodeAppGUI</RootNamespace>
+    <ApplicationIcon>assets\app.ico</ApplicationIcon>
+    <AssemblyTitle>Template Node App</AssemblyTitle>
+    <Description>Criador de projetos Node.js com interface gráfica</Description>
+    <Company>JoaoHCSilva</Company>
+    <Product>Template Node App</Product>
+    <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.*" />
