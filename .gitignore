@@ -5,7 +5,8 @@
 *.log
 *.tmp
 ~$*
-
+# github
+*.txt
 # Cache do PowerShell
 *.pssc
 *.psm1_disabled
