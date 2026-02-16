@@ -126,17 +126,15 @@ namespace TemplateNodeAppGUI
             string templateEscolhido = template >= 0 && template < templates.Length ? templates[template] : "vanilla";
             string extensaoEscolhida = linguagem >= 0 && linguagem < extensoes.Length ? extensoes[linguagem] : "js";
 
-            // Escapa backslashes para uso dentro de strings PowerShell com aspas simples
-            string modulePathEscaped = modulePath.Replace("\\", "\\\\");
-            string caminhoEscaped = caminho.Replace("\\", "\\\\");
 
             // Script PowerShell que replica a lógica do main.ps1 usando os parâmetros da GUI
             // Salvo em arquivo .ps1 temporário — usa sintaxe PowerShell padrão
+            // NOTA: PowerShell single-quoted strings são literais, não precisam de escape de backslash
             return $@"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 
-$modulePath = '{modulePathEscaped}'
+$modulePath = '{modulePath}'
 
 Import-Module (Join-Path $modulePath 'viteInstal.psm1') -Force
 Import-Module (Join-Path $modulePath 'adicionarFiles.psm1') -Force
@@ -146,7 +144,7 @@ Import-Module (Join-Path $modulePath 'templateModule.psm1') -Force
 Import-Module (Join-Path $modulePath 'packageScriptsModule.psm1') -Force
 
 $nomeProjeto = '{nomeProjeto}'
-$caminho = '{caminhoEscaped}'
+$caminho = '{caminho}'
 $extensaoEscolhida = '{extensaoEscolhida}'
 $templateEscolhido = '{templateEscolhido}'
 

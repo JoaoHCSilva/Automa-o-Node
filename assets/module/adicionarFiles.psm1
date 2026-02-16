@@ -114,17 +114,18 @@ DB_HOST=SQLITE
 # DB_NAME=
 "@
     Write-Host "Iniciando criacao dos arquivos . . . `n"
+    $caminhoCompleto = Join-Path $caminho $nomeProjeto
     # Adicionando os arquivos a raiz do projeto
-    New-Item -ItemType File -Path "$caminho" -Name $nomeArquiApp -Value $dadosAppJs | Out-Null
+    New-Item -ItemType File -Path "$caminhoCompleto" -Name $nomeArquiApp -Value $dadosAppJs | Out-Null
     Write-Host "Criado $nomeArquiApp ..." -ForegroundColor White
-    New-Item -ItemType File -Path "$caminho" -Name "README.md" -Value $readmeMd | Out-Null
+    New-Item -ItemType File -Path "$caminhoCompleto" -Name "README.md" -Value $readmeMd | Out-Null
     Write-Host "Criado README.md ...`n" -ForegroundColor White
-    New-Item -ItemType File -Path "$caminho" -Name ".env.example" -Value $envExample | Out-Null
+    New-Item -ItemType File -Path "$caminhoCompleto" -Name ".env.example" -Value $envExample | Out-Null
     Write-Host "Criado .env.example ...`n" -ForegroundColor White
     
     # Cria o arquivo .env copiando o .env.example
     try {
-        Copy-Item -Path "$caminho\$nomeProjeto\.env.example" -Destination "$caminho\$nomeProjeto\.env" -ErrorAction Stop
+        Copy-Item -Path "$caminhoCompleto\.env.example" -Destination "$caminhoCompleto\.env" -ErrorAction Stop
         Write-Host "Criado .env (cópia de .env.example) ...`n" -ForegroundColor Green
     } catch {
         Write-Host "[AVISO] Não foi possível criar .env automaticamente: $_" -ForegroundColor Yellow
