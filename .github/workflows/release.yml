@@ -44,6 +44,14 @@ jobs:
             2. Extraia em uma pasta de sua preferência
             3. Execute o `TemplateNodeAppGUI.exe` e pau na máquina :)
 
+            ### ⚠️ Aviso do Windows SmartScreen
+            Na primeira execução, o Windows pode exibir **"O Windows protegeu o computador"**.
+            Isso é normal para aplicativos sem assinatura digital. Para prosseguir:
+            1. Clique em **"Mais informações"**
+            2. Clique em **"Executar assim mesmo"**
+
+            Outra opção: clique com botão direito no `.exe` → **Propriedades** → marque **"Desbloquear"** → OK
+
             ### Requisitos
             - Windows 10/11 (64-bit)
             - Node.js instalado

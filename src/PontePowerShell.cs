@@ -116,8 +116,7 @@ namespace TemplateNodeAppGUI
         /// </summary>
         private string GerarScriptWrapper(string nomeProjeto, string caminho, int linguagem, int template)
         {
-            string scriptPath = Path.Combine(_assetsPath, "main.ps1").Replace("\\", "\\\\");
-            string modulePath = Path.Combine(_assetsPath, "module").Replace("\\", "\\\\");
+            string modulePath = Path.Combine(_assetsPath, "module");
 
             // Lista de templates Vite disponíveis (mesma ordem do main.ps1)
             string[] templates = { "vanilla", "vanilla-ts", "vue", "vue-ts", "react", "react-ts",
@@ -127,25 +126,27 @@ namespace TemplateNodeAppGUI
             string templateEscolhido = template >= 0 && template < templates.Length ? templates[template] : "vanilla";
             string extensaoEscolhida = linguagem >= 0 && linguagem < extensoes.Length ? extensoes[linguagem] : "js";
 
+            // Escapa backslashes para uso dentro de strings PowerShell com aspas simples
+            string modulePathEscaped = modulePath.Replace("\\", "\\\\");
+            string caminhoEscaped = caminho.Replace("\\", "\\\\");
+
             // Script PowerShell que replica a lógica do main.ps1 usando os parâmetros da GUI
-            // Agora é salvo em arquivo .ps1 temporário, então não precisa de escape especial
+            // Salvo em arquivo .ps1 temporário — usa sintaxe PowerShell padrão
             return $@"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
-$PSDefaultParameterValues['*:Encoding'] = 'utf8'
 
-$scriptDir = '{modulePath.Replace("\\\\", "\\")}'
-$modulePath = $scriptDir
+$modulePath = '{modulePathEscaped}'
 
-Import-Module ""$modulePath\\viteInstal.psm1"" -Force
-Import-Module ""$modulePath\\adicionarFiles.psm1"" -Force
-Import-Module ""$modulePath\\dependenciasModule.psm1"" -Force
-Import-Module ""$modulePath\\routesModel.psm1"" -Force
-Import-Module ""$modulePath\\templateModule.psm1"" -Force
-Import-Module ""$modulePath\\packageScriptsModule.psm1"" -Force
+Import-Module (Join-Path $modulePath 'viteInstal.psm1') -Force
+Import-Module (Join-Path $modulePath 'adicionarFiles.psm1') -Force
+Import-Module (Join-Path $modulePath 'dependenciasModule.psm1') -Force
+Import-Module (Join-Path $modulePath 'routesModel.psm1') -Force
+Import-Module (Join-Path $modulePath 'templateModule.psm1') -Force
+Import-Module (Join-Path $modulePath 'packageScriptsModule.psm1') -Force
 
 $nomeProjeto = '{nomeProjeto}'
-$caminho = '{caminho}'
+$caminho = '{caminhoEscaped}'
 $extensaoEscolhida = '{extensaoEscolhida}'
 $templateEscolhido = '{templateEscolhido}'
 
@@ -183,16 +184,18 @@ Write-Host ""Projeto criado em: $caminhoCompleto"" -ForegroundColor Green
 
 $pastas = @('Controllers', 'Models', 'Views', 'Routes', 'Services', 'Helpers', 'Config', 'Database', 'Middleware')
 foreach ($pasta in $pastas) {{
-    New-Item -Path ""$caminho\\$nomeProjeto"" -Name ""$pasta"" -ItemType Directory -ErrorAction Stop | Out-Null
+    $pastaPath = Join-Path $caminhoCompleto $pasta
+    New-Item -Path $pastaPath -ItemType Directory -ErrorAction Stop | Out-Null
     Write-Host ""- $pasta"" -ForegroundColor White
 }}
 
-Set-Location -Path ""$caminho\\$nomeProjeto"" -ErrorAction Stop
+Set-Location -Path $caminhoCompleto -ErrorAction Stop
 
 $nomeArquiApp = ""app.$extensaoEscolhida""
 adicionarFiles -caminho $caminho -nomeProjeto $nomeProjeto -nomeArquiApp $nomeArquiApp -extensao $extensaoEscolhida
 
-$gitignoreContent = 'node_modules/
+$gitignoreContent = @'
+node_modules/
 .env
 dist/
 build/
@@ -201,8 +204,10 @@ build/
 temp/
 coverage/
 .vscode/
-.idea/'
-New-Item -Path ""$caminho\\$nomeProjeto\\.gitignore"" -ItemType File -Value $gitignoreContent -Force | Out-Null
+.idea/
+'@
+$gitignorePath = Join-Path $caminhoCompleto '.gitignore'
+New-Item -Path $gitignorePath -ItemType File -Value $gitignoreContent -Force | Out-Null
 Write-Host 'Criado .gitignore' -ForegroundColor Green
 
 routesModel -caminho 'Routes' -extensao $extensaoEscolhida
@@ -229,3 +234,4 @@ Write-Host ""Template: $templateEscolhido""
         }
     }
 }
+
