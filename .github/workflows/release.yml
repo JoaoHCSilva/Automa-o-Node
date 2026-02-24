@@ -62,3 +62,18 @@ jobs:
           prerelease: false
           files: |
             TemplateNodeApp-${{ github.ref_name }}-win-x64.zip
+          # deletar ultimas tags
+      - name: Limpar releases e tags antigas (manter 3 últimas)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Listar todas as releases ordenadas por data (mais recente primeiro)
+          $releases = gh release list --limit 100 --json tagName | ConvertFrom-Json
+
+          # Manter as 3 mais recentes, deletar o resto
+          $toDelete = $releases | Select-Object -Skip 3
+
+          foreach ($release in $toDelete) {
+            Write-Host "Deletando release e tag: $($release.tagName)"
+            gh release delete $release.tagName --yes --cleanup-tag
+          }
