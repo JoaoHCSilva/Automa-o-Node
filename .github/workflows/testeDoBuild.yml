@@ -1,7 +1,7 @@
 name: Teste do build - main
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
