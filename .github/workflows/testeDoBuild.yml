@@ -3,7 +3,7 @@ name: Teste do build - main
 on:
   pull_request:
     branches:
-      - main
+      - developer
 
 permissions:
   contents: read

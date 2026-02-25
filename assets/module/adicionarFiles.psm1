@@ -17,6 +17,8 @@ function adicionarFiles() {
 
     $dadosAppJs = @"
 import express from "express";
+import session from "express-session";
+import inertia from "express-inertia";
 import dotenv from "dotenv";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
@@ -50,6 +52,19 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger); // Logger de requisições
+
+// Middleware de sessão (necessário para mensagens flash)
+app.use(session({
+  secret: 'sua_chave_secreta',
+  resave: false,
+  saveUninitialized: false,
+}));
+
+// Middleware do Inertia
+app.use(await inertia({
+  rootElementId: 'app',
+  assetsVersion: 'v1',
+}));
 
 // Usar as rotas
 app.use(routes);

@@ -1,16 +1,21 @@
 # instala as dependecias do projeto
 function installDependencies {
     param(
-        [string]$path
+        [string]$path,
+        [string]$template
     )
     Write-Host "Instalando dependecias..." -ForegroundColor white
+    if($template -eq "react" -or $template -eq "react-ts"){
+        $template = "react"
+    } elseif($template -eq "vue" -or $template -eq "vue-ts"){
+        $template = "vue"
+    }
     
     # Dependências de produção
     $depProducao = @("express", "dotenv", "cors", "jsonwebtoken", "bcrypt", "express-validator", "express-rate-limit", "winston")
     
     # Dependências de desenvolvimento
-    $depDesenvolvimento = @("nodemon", "ts-node", "typescript", "@types/express", "@types/node", "@types/cors", "@types/jsonwebtoken", "@types/bcrypt", "concurrently")
-    
+    $depDesenvolvimento = @("nodemon", "ts-node", "typescript", "@types/express", "express-inertia", "express-session", "@inertiajs/$template", "@types/node", "@types/cors", "@types/jsonwebtoken", "@types/bcrypt", "concurrently", "inertia-node", "@inertiajs/inertia" ,"@inertiajs/inertia-react" )
     Write-Host "Instalando dependencias de producao..." -ForegroundColor Yellow
     Write-Host "  express, dotenv, cors, jsonwebtoken, bcrypt, express-validator, express-rate-limit, winston" -ForegroundColor Gray
     npm install $depProducao
