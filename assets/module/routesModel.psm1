@@ -5,14 +5,17 @@ function routesModel {
         [string]$extensao
     )
     if ($extensao -eq "ts") {
-        $reqERes = "req: any, res: any"
+        $reqERes = "req: Request, res: Response"
+        $importRequest = "import type {Request, Response}"
     }
     elseif ($extensao -eq "js") {
         $reqERes = "req, res"
+        $importRequest= ""
     }
 
     Write-Host "Iniciando a criacao do arquivo router.$extensao...`n" -ForegroundColor Yellow
     $dadosRouter = @"
+$importRequest
 import { Router } from "express";
 import UserController from "../Controllers/UserController.$extensao";
 import { authMiddleware, logMiddleware, validateUser } from "../Middleware/middlewares.$extensao";

@@ -36,9 +36,8 @@ function New-ExampleMiddleware {
     # Define tipagem baseada na extensao
     if ($extensao -eq "ts") {
         $tipoReqRes = "req: Request, res: Response, next: NextFunction"
-        $importExpress = "import { Request, Response, NextFunction } from 'express';"
+        $importExpress = "import type { Request, Response, NextFunction } from 'express';"
         $errorHandlerParam = "err: any"
-        $returnType = ": void"
     }
     else {
         $tipoReqRes = "req, res, next"
@@ -54,7 +53,7 @@ $importExpress
 /**
  * Middleware de autenticacao de exemplo
  */
-export const authMiddleware = ($tipoReqRes)$returnType => {
+export const authMiddleware = ($tipoReqRes)=> {
     const token = req.headers.authorization;
     
     if (!token) {
@@ -81,7 +80,7 @@ export const authMiddleware = ($tipoReqRes)$returnType => {
 /**
  * Middleware de log de requisicoes
  */
-export const logMiddleware = ($tipoReqRes)$returnType => {
+export const logMiddleware = ($tipoReqRes)=> {
     const timestamp = new Date().toISOString();
     console.log('['+ timestamp + ']', req.method, req.path);
     next();
@@ -90,7 +89,7 @@ export const logMiddleware = ($tipoReqRes)$returnType => {
 /**
  * Middleware de validacao de dados
  */
-export const validateUser = ($tipoReqRes)$returnType => {
+export const validateUser = ($tipoReqRes)=> {
     const { name, email } = req.body;
     
     if (!name || name.trim() === '') {
@@ -113,7 +112,7 @@ export const validateUser = ($tipoReqRes)$returnType => {
 /**
  * Middleware de tratamento de erros
  */
-export const errorHandler = ($errorHandlerParam, $tipoReqRes)$returnType => {
+export const errorHandler = ($errorHandlerParam, $tipoReqRes)=> {
     console.error(err.stack);
     
     res.status(err.status || 500).json({

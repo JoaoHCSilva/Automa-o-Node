@@ -29,10 +29,17 @@ function New-ValidationModule {
         [ValidateSet("js", "ts")]
         [string]$extensao = "js"
     )
+
+    if($extensao -eq 'ts'){
+        $importRequest = "import type { Request, Response, NextFunction } from 'express';"
+    }else {
+        $importRequest = ''
+    }
     
     # Conteúdo do módulo de validação
     $conteudoValidation = @"
 import { body, param, validationResult } from 'express-validator';
+$importRequest
 
 /**
  * Middleware para verificar erros de validação
@@ -143,7 +150,7 @@ export const authValidation = {
 /**
  * Validação genérica para sanitizar strings
  */
-export const sanitizeString = (fieldName) => {
+export const sanitizeString = (fieldName:string) => {
     return body(fieldName)
         .trim()
         .escape();
