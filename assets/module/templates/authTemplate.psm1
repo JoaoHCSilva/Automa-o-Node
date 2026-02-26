@@ -35,7 +35,7 @@ function New-AuthModule {
     # Define tipagem baseada na extensão
     if ($extensao -eq "ts") {
         $tipoReqRes = "req: Request, res: Response"
-        $importExpress = "import { Request, Response } from 'express';"
+        $importExpress = "import type { Request, Response } from 'express';"
         $importJWT = "import jwt from 'jsonwebtoken';"
         $importBcrypt = "import bcrypt from 'bcrypt';"
         $catchError = "catch (error: any)"

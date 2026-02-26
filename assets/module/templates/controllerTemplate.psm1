@@ -33,7 +33,7 @@ function New-ExampleController {
     # Define tipagem baseada na extensao
     if ($extensao -eq "ts") {
         $tipoReqRes = "req: Request, res: Response"
-        $importExpress = "import { Request, Response } from 'express';"
+        $importExpress = "import type{ Request, Response } from 'express';"
         $catchError = "catch (error: any)"
         $returnType = ": Promise<void>"
     }
@@ -48,6 +48,7 @@ function New-ExampleController {
     $conteudoController = @"
 $importExpress
 import UserService from '../Services/UserService.$extensao';
+
 
 /**
  * Controller de exemplo para gerenciar usuarios
