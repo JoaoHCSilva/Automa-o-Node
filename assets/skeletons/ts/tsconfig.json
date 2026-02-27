@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    // Alvo de compilação — ES2022 suporta top-level await e features modernas
+    "target": "ES2022",
+    
+    // Sistema de módulos do Node.js moderno
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    
+    // Habilita verificações rigorosas de tipo
+    "strict": true,
+    
+    // Interoperabilidade com módulos CommonJS (import x from 'y')
+    "esModuleInterop": true,
+    
+    // Cada arquivo é tratado como módulo isolado
+    "isolatedModules": true,
+    
+    // Gera source maps para debug
+    "sourceMap": true,
+    
+    // Pasta de saída da compilação (quando usar tsc)
+    "outDir": "./dist",
+    
+    // Pasta raiz dos arquivos fonte
+    "rootDir": ".",
+    
+    // Pula verificação de tipos em node_modules (mais rápido)
+    "skipLibCheck": true,
+    
+    // Permite importar arquivos JSON como módulos
+    "resolveJsonModule": true,
+    
+    // Garante consistência de casing em imports (evita bugs em Linux)
+    "forceConsistentCasingInFileNames": true
+  },
+  // Inclui apenas arquivos TS do backend (ignora o frontend Vite)
+  "include": [
+    "app.ts",
+    "Controllers/**/*.ts",
+    "Models/**/*.ts",
+    "Services/**/*.ts",
+    "Routes/**/*.ts",
+    "Middleware/**/*.ts",
+    "Config/**/*.ts",
+    "Helpers/**/*.ts",
+    "Database/**/*.ts"
+  ],
+  // Exclui pastas que não devem ser compiladas
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src"
+  ]
+}

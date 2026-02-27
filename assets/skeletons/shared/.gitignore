@@ -1,0 +1,22 @@
+# Dependências e build
+node_modules/
+dist/
+build/
+
+# Variáveis de ambiente (contém secrets)
+.env
+
+# Logs gerados em runtime
+*.log
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Arquivos temporários e cache
+temp/
+coverage/
+
+# Configurações de IDE
+.vscode/
+.idea/

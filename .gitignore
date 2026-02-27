@@ -16,4 +16,7 @@ bin/
 obj/
 *.user
 *.suo
+
+# Agentes vscode
 /.agent
+/.vscode

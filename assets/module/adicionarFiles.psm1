@@ -1,4 +1,6 @@
-# criar pasta app.js
+# adicionarFiles.psm1 — Cria arquivos base do projeto (app, README, .env)
+# Refatorado para copiar de skeletons em vez de usar Here-Strings inline
+
 function adicionarFiles() {
     param(
         [string]$caminho,
@@ -7,151 +9,57 @@ function adicionarFiles() {
         [string]$extensao
     )
 
-
-    if ($extensao -eq "ts") {
-        $reqERes = "req: any, res: any"
-    }
-    elseif ($extensao -eq "js") {
-        $reqERes = "req, res"
-    }
-
-    $dadosAppJs = @"
-import express from "express";
-import session from "express-session";
-import inertia from "express-inertia";
-import dotenv from "dotenv";
-import cors from "cors";
-import rateLimit from "express-rate-limit";
-import routes from "./Routes/router.$extensao";
-import { errorHandler } from "./Middleware/middlewares.$extensao";
-import logger, { requestLogger } from "./Config/logger.$extensao";
-
-dotenv.config();
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // Limite de 100 requisições por IP
-    message: 'Muitas requisições deste IP, tente novamente mais tarde.'
-});
-
-// Configuracao CORS
-const corsOptions = {
-    origin: process.env.CORS_ORIGIN || '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-};
-
-// Middlewares globais
-app.use(limiter);
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(requestLogger); // Logger de requisições
-
-// Middleware de sessão (necessário para mensagens flash)
-app.use(session({
-  secret: 'sua_chave_secreta',
-  resave: false,
-  saveUninitialized: false,
-}));
-
-// Middleware do Inertia
-app.use(await inertia({
-  rootElementId: 'app',
-  assetsVersion: 'v1',
-}));
-
-// Usar as rotas
-app.use(routes);
-
-// Middleware de tratamento de erros (deve ser o último)
-app.use(errorHandler);
-
-app.listen(PORT, () => {
-    logger.info('========================================');
-    logger.info('  Servidor rodando com sucesso!');
-    logger.info('========================================');
-    logger.info('  URL: http://localhost:' + PORT);
-    logger.info('  Ambiente: ' + (process.env.NODE_ENV || 'development'));
-    logger.info('========================================');
-});
-
-"@
-
-    $readmeMd = @"
-# $nomeProjeto
-
-Este projeto foi gerado automaticamente como um template básico de uma aplicação Node.js com Express.
-
-## 🚀 Tecnologias
-
-As seguintes ferramentas foram usadas na construção do projeto:
-
-- [Node.js](https://nodejs.org/en/)
-- [Express](https://expressjs.com/)
-- [Dotenv](https://www.npmjs.com/package/dotenv)
-
-## 🏁 Como começar
-
-### Pré-requisitos
-
-Antes de começar, você vai precisar ter instalado em sua máquina as seguintes ferramentas:
-[Git](https://git-scm.com), [Node.js](https://nodejs.org/en/).
-
-### 🎲 Rodando a aplicação
-
-``` bash
-# Instale as dependências
-$ npm install
-
-# Execute a aplicação
-$ node app.js
-
-"@
-
-    $envExample = @"
-PORT=3000
-CORS_ORIGIN=http://localhost:5173
-NODE_ENV=development
-LOG_LEVEL=info
-
-# JWT Secret (MUDE EM PRODUÇÃO!)
-JWT_SECRET=seu-secret-super-secreto-mude-isso
-
-DB_HOST=SQLITE
-# DB_USER=
-# DB_PASSWORD=
-# DB_NAME=
-"@
     Write-Host "Iniciando criacao dos arquivos . . . `n"
-    $caminhoCompleto = "."
-    # Adicionando os arquivos a raiz do projeto
-    New-Item -ItemType File -Path . -Name $nomeArquiApp -Value $dadosAppJs | Out-Null
+
+    # Determina o caminho base dos skeletons conforme a linguagem escolhida
+    $skeletonsBase = Join-Path $PSScriptRoot "..\skeletons"
+    $skeletonsLang = Join-Path $skeletonsBase $extensao
+    $skeletonsShared = Join-Path $skeletonsBase "shared"
+
+    # Copia o arquivo principal da aplicação (app.ts ou app.js) do skeleton
+    $appSkeleton = Join-Path $skeletonsLang "app.$extensao"
+    $appContent = Get-Content $appSkeleton -Raw -Encoding UTF8
+    New-Item -ItemType File -Path . -Name $nomeArquiApp -Value $appContent | Out-Null
     Write-Host "Criado $nomeArquiApp ..." -ForegroundColor White
-    New-Item -ItemType File -Path . -Name "README.md" -Value $readmeMd | Out-Null
+
+    # Copia o README.md do skeleton shared e substitui o token do nome do projeto
+    $readmeSkeleton = Join-Path $skeletonsShared "README.md"
+    $readmeContent = (Get-Content $readmeSkeleton -Raw -Encoding UTF8) -replace '__PROJECT_NAME__', $nomeProjeto
+    New-Item -ItemType File -Path . -Name "README.md" -Value $readmeContent | Out-Null
     Write-Host "Criado README.md ...`n" -ForegroundColor White
-    New-Item -ItemType File -Path . -Name ".env.example" -Value $envExample | Out-Null
+
+    # Copia o .env.example do skeleton shared
+    $envSkeleton = Join-Path $skeletonsShared ".env.example"
+    $envContent = Get-Content $envSkeleton -Raw -Encoding UTF8
+    New-Item -ItemType File -Path . -Name ".env.example" -Value $envContent | Out-Null
     Write-Host "Criado .env.example ...`n" -ForegroundColor White
     
-    # Cria o arquivo .env copiando o .env.example
+    # Cria o .env copiando o .env.example para uso local imediato
+    $caminhoCompleto = "."
     try {
         Copy-Item -Path "$caminhoCompleto\.env.example" -Destination "$caminhoCompleto\.env" -ErrorAction Stop
         Write-Host "Criado .env (cópia de .env.example) ...`n" -ForegroundColor Green
     } catch {
         Write-Host "[AVISO] Não foi possível criar .env automaticamente: $_" -ForegroundColor Yellow
     }
+
+    # Se for TypeScript, copia o tsconfig.json rigoroso do skeleton
+    if ($extensao -eq "ts") {
+        $tsconfigSkeleton = Join-Path $skeletonsLang "tsconfig.json"
+        if (Test-Path $tsconfigSkeleton) {
+            $tsconfigContent = Get-Content $tsconfigSkeleton -Raw -Encoding UTF8
+            New-Item -ItemType File -Path . -Name "tsconfig.json" -Value $tsconfigContent | Out-Null
+            Write-Host "Criado tsconfig.json ...`n" -ForegroundColor Green
+        }
+    }
     
+    # Exibe lista dos arquivos criados
     Write-Host "Arquivos criados:`n" -ForegroundColor Yellow
-    foreach ($arquivo in @($nomeArquiApp, "README.md", ".env.example", ".env")) {
+    $arquivos = @($nomeArquiApp, "README.md", ".env.example", ".env")
+    if ($extensao -eq "ts") { $arquivos += "tsconfig.json" }
+    foreach ($arquivo in $arquivos) {
         Write-Host " - $arquivo`n" -ForegroundColor White
     }
-
-
 }
 
 Export-ModuleMember -Function adicionarFiles

@@ -192,21 +192,12 @@ Set-Location -Path $caminhoCompleto -ErrorAction Stop
 $nomeArquiApp = ""app.$extensaoEscolhida""
 adicionarFiles -caminho $caminho -nomeProjeto $nomeProjeto -nomeArquiApp $nomeArquiApp -extensao $extensaoEscolhida
 
-$gitignoreContent = @'
-node_modules/
-.env
-dist/
-build/
-*.log
-.DS_Store
-temp/
-coverage/
-.vscode/
-.idea/
-'@
+$skeletonsShared = Join-Path $modulePath '..\skeletons\shared'
+$gitignoreSkeleton = Join-Path $skeletonsShared '.gitignore'
+$gitignoreContent = Get-Content $gitignoreSkeleton -Raw -Encoding UTF8
 $gitignorePath = Join-Path $caminhoCompleto '.gitignore'
 New-Item -Path $gitignorePath -ItemType File -Value $gitignoreContent -Force | Out-Null
-Write-Host 'Criado .gitignore' -ForegroundColor Green
+Write-Host 'Criado .gitignore (do skeleton)' -ForegroundColor Green
 
 routesModel -caminho 'Routes' -extensao $extensaoEscolhida
 
