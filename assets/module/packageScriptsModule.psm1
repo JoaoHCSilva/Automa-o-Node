@@ -5,6 +5,7 @@ Adiciona scripts personalizados ao package.json para desenvolvimento full-stack.
 .DESCRIPTION
 Este módulo atualiza o package.json gerado pelo Vite para incluir scripts
 adicionais para executar o backend Node.js/Express.
+Option B: Usa tsx em vez de ts-node e node --watch em vez de nodemon.
 
 .PARAMETER caminho
 O caminho raiz do projeto onde o package.json está localizado.
@@ -12,12 +13,10 @@ O caminho raiz do projeto onde o package.json está localizado.
 .PARAMETER extensao
 A extensão do arquivo principal (js ou ts).
 
-.EXAMPLE
-Add-BackendScripts -caminho "C:\meu-projeto" -extensao "ts"
-
 .NOTES
 Autor: João Henrique
 Data: 02/02/2026
+Atualizado: tsx + node --watch (sem nodemon/ts-node)
 #>
 
 function Add-BackendScripts {
@@ -38,33 +37,35 @@ function Add-BackendScripts {
     }
     
     try {
-        # Lê o package.json
+        # Lê o package.json existente (gerado pelo Vite)
         $packageJson = Get-Content $packageJsonPath -Raw | ConvertFrom-Json
         
-        # Define os scripts baseados na extensão
+        # Define scripts baseados na extensão
+        # tsx: compilação instantânea via esbuild (substitui ts-node)
+        # node --watch: hot-reload nativo do Node 22+ (substitui nodemon)
         if ($extensao -eq "ts") {
-            $serverScript = "ts-node app.ts"
-            $devBackendScript = "nodemon --exec ts-node app.ts"
+            $serverScript = "tsx app.ts"
+            $devBackendScript = "node --watch --import tsx app.ts"
         } else {
             $serverScript = "node app.js"
-            $devBackendScript = "nodemon app.js"
+            $devBackendScript = "node --watch app.js"
         }
         
-        # Adiciona ou atualiza scripts
+        # Garante que o objeto scripts existe
         if (-not $packageJson.scripts) {
             $packageJson | Add-Member -MemberType NoteProperty -Name "scripts" -Value @{}
         }
         
-        # Preserva scripts existentes do Vite e adiciona novos
+        # Preserva scripts do Vite e adiciona scripts de backend
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "server" -Value $serverScript -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:backend" -Value $devBackendScript -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:frontend" -Value ($packageJson.scripts.dev ?? "vite") -Force
         
-        # Script para rodar frontend e backend simultaneamente (requer concurrently)
+        # Script fullstack: roda frontend e backend simultaneamente (requer concurrently)
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:fullstack" -Value "concurrently `"npm run dev:backend`" `"npm run dev:frontend`"" -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "start" -Value $serverScript -Force
         
-        # Salva o package.json atualizado com indentação
+        # Salva o package.json atualizado
         $packageJson | ConvertTo-Json -Depth 10 | Set-Content $packageJsonPath -Encoding UTF8
         
         Write-Host "  [OK] Scripts adicionados ao package.json:" -ForegroundColor Green

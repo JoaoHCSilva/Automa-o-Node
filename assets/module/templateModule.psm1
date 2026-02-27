@@ -90,7 +90,7 @@ function New-ProjectTemplates {
             Write-Host "  [OK] Pasta logs criada" -ForegroundColor Green
             $sucessos++
         } catch {
-            Write-Host "  [AVISO] Não foi possível criar pasta logs" -ForegroundColor YellowAuthModule, New-ValidationModule, New-LoggerModule, New-DockerConfig, New-
+            Write-Host "  [AVISO] Não foi possível criar pasta logs" -ForegroundColor Yellow
         }
     } else {
         $sucessos++
@@ -108,4 +108,4 @@ function New-ProjectTemplates {
 }
 
 # Exporta todas as funcoes (das submodules + a funcao agregadora)
-Export-ModuleMember -Function New-ExampleController, New-ExampleModel, New-ExampleService, New-ExampleMiddleware, New-DatabaseConfig, New-ProjectTemplates
+Export-ModuleMember -Function New-ExampleController, New-ExampleModel, New-ExampleService, New-ExampleMiddleware, New-DatabaseConfig, New-AuthModule, New-ValidationModule, New-LoggerModule, New-DockerConfig, New-ProjectTemplates

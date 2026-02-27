@@ -3,21 +3,12 @@
 Cria configuração Docker para o projeto.
 
 .DESCRIPTION
-Este módulo cria Dockerfile, docker-compose.yml e .dockerignore
-para containerização da aplicação.
-
-.PARAMETER caminho
-O caminho raiz do projeto.
-
-.PARAMETER extensao
-A extensão do arquivo (js ou ts).
-
-.EXAMPLE
-New-DockerConfig -caminho "C:\meu-projeto" -extensao "ts"
+Este módulo copia Dockerfile, Dockerfile.dev, docker-compose.yml e .dockerignore
+dos skeletons shared (independentes de linguagem).
 
 .NOTES
 Autor: João Henrique
-Data: 02/02/2026
+Refatorado: Agora usa skeletons em vez de Here-Strings
 #>
 
 function New-DockerConfig {
@@ -30,163 +21,26 @@ function New-DockerConfig {
         [string]$extensao = "js"
     )
     
-    # Dockerfile
-    $dockerfile = @"
-# Estágio 1: Build
-FROM node:22-alpine AS builder
-
-WORKDIR /app
-
-# Copia package.json e package-lock.json
-COPY package*.json ./
-
-# Instala dependências (inclui dev deps para build)
-RUN npm ci
-
-# Copia código fonte
-COPY . .
-
-# Build do frontend
-RUN npm run build
-
-# Estágio 2: Produção
-FROM node:22-alpine
-
-WORKDIR /app
-
-# Copia apenas o necessário do estágio de build
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/dist ./dist
-
-# Controla instalação de dependências por ambiente
-ARG NODE_ENV=production
-
-# Instala dependências conforme ambiente
-RUN if [ "$NODE_ENV" = "production" ]; then npm ci --only=production; else npm ci; fi
-
-# Copia o restante do backend
-COPY . .
-
-# Cria usuário não-root
-RUN addgroup -S -g 1001 nodejs && \
-    adduser -S -u 1001 -G nodejs nodejs && \
-    chown -R nodejs:nodejs /app
-
-USER nodejs
-
-# Expõe a porta
-EXPOSE 3000
-
-# Variáveis de ambiente
-ENV NODE_ENV=production
-ENV PORT=3000
-
-# Comando para iniciar a aplicação
-CMD ["npm", "start"]
-"@
+    # Docker files são shared — independentes da linguagem
+    $skeletonsBase = Join-Path $PSScriptRoot "..\..\skeletons"
+    $skeletonsShared = Join-Path $skeletonsBase "shared"
     
-    # docker-compose.yml
-    $dockerCompose = @"
-version: '3.8'
-
-services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "3001:3000"
-      - "5174:5173"
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: npm run dev:fullstack
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  # Exemplo de serviço de banco de dados (descomente se necessário)
-  # postgres:
-  #   image: postgres:15-alpine
-  #   environment:
-  #     POSTGRES_DB: myapp
-  #     POSTGRES_USER: user
-  #     POSTGRES_PASSWORD: password
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   networks:
-  #     - app-network
-
-networks:
-  app-network:
-    driver: bridge
-
-# volumes:
-#   postgres_data:
-"@
-    
-  # docker-compose-dev
-  $dockerFileDev = @"
-
- # Dockerfile para desenvolvimento
-FROM node:22-alpine
-
-WORKDIR /app
-
-# Instala dependências globais necessárias
-RUN npm install -g concurrently nodemon
-
-# Copia package.json para instalar dependências
-COPY package*.json ./
-
-# Instala todas as dependências
-RUN npm ci
-
-# Expõe as portas
-EXPOSE 3000 5173
-
-# Comando padrão
-CMD ["npm", "run", "dev:fullstack"]
-
-@"
-    $dockerignore = @"
-node_modules
-npm-debug.log
-.env
-.git
-.gitignore
-README.md
-.vscode
-.idea
-dist
-build
-coverage
-logs
-*.log
-.DS_Store
-Thumbs.db
-"@
+    # Lista de arquivos Docker a copiar do skeleton
+    $dockerFiles = @(
+        @{ Skeleton = "Dockerfile"; Destino = "Dockerfile" },
+        @{ Skeleton = "Dockerfile.dev"; Destino = "Dockerfile.dev" },
+        @{ Skeleton = "docker-compose.yml"; Destino = "docker-compose.yml" },
+        @{ Skeleton = ".dockerignore"; Destino = ".dockerignore" }
+    )
     
     try {
-        # Cria Dockerfile
-        New-Item -Path (Join-Path $caminho "Dockerfile") -ItemType File -Value $dockerfile -Force | Out-Null
-        Write-Host "  [OK] Dockerfile criado" -ForegroundColor Green
-        
-        # cria dockerfile de desenvolvimento
-        New-Item -Path (Join-Path $caminho "Dockerfile.dev") -ItemType File -Value $dockerFileDev -Force | Out-Null
-        Write-Host "  [OK] Dockerfile.dev criado" -ForegroundColor Green
-        # Cria docker-compose.yml
-        New-Item -Path (Join-Path $caminho "docker-compose.yml") -ItemType File -Value $dockerCompose -Force | Out-Null
-        Write-Host "  [OK] docker-compose.yml criado" -ForegroundColor Green
-        
-        # Cria .dockerignore
-        New-Item -Path (Join-Path $caminho ".dockerignore") -ItemType File -Value $dockerignore -Force | Out-Null
-        Write-Host "  [OK] .dockerignore criado" -ForegroundColor Green
+        # Copia cada arquivo Docker do skeleton para o projeto
+        foreach ($arquivo in $dockerFiles) {
+            $skeletonPath = Join-Path $skeletonsShared $arquivo.Skeleton
+            $conteudo = Get-Content $skeletonPath -Raw -Encoding UTF8
+            New-Item -Path (Join-Path $caminho $arquivo.Destino) -ItemType File -Value $conteudo -Force | Out-Null
+            Write-Host "  [OK] $($arquivo.Destino) criado" -ForegroundColor Green
+        }
         
         return $true
     }
