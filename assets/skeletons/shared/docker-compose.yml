@@ -1,0 +1,43 @@
+# docker-compose.yml — Orquestração de containers para desenvolvimento
+version: '3.8'
+
+services:
+  # Serviço principal da aplicação (frontend + backend)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3000"   # Backend Express
+      - "5174:5173"   # Frontend Vite
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    volumes:
+      - .:/app              # Monta código fonte para hot-reload
+      - /app/node_modules   # Preserva node_modules do container
+    command: npm run dev:fullstack
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Exemplo de banco de dados PostgreSQL (descomente se necessário)
+  # postgres:
+  #   image: postgres:15-alpine
+  #   environment:
+  #     POSTGRES_DB: myapp
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+# volumes:
+#   postgres_data:

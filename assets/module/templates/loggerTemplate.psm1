@@ -3,21 +3,13 @@
 Cria configuração de logging com Winston.
 
 .DESCRIPTION
-Este módulo cria configuração profissional de logging usando Winston
-com múltiplos transportes e formatação adequada.
-
-.PARAMETER caminho
-O caminho raiz do projeto.
-
-.PARAMETER extensao
-A extensão do arquivo (js ou ts).
-
-.EXAMPLE
-New-LoggerModule -caminho "C:\meu-projeto" -extensao "ts"
+Este módulo copia a configuração de logger do skeleton
+correspondente a linguagem escolhida (js ou ts).
+Também atualiza o .gitignore para incluir a pasta logs/.
 
 .NOTES
 Autor: João Henrique
-Data: 02/02/2026
+Refatorado: Agora usa skeletons em vez de Here-Strings
 #>
 
 function New-LoggerModule {
@@ -30,102 +22,30 @@ function New-LoggerModule {
         [string]$extensao = "js"
     )
     
-    # Conteúdo do logger
-    $conteudoLogger = @'
-import winston from 'winston';
-import path from 'path';
+    # Monta caminho do skeleton conforme a linguagem
+    $skeletonsBase = Join-Path $PSScriptRoot "..\..\skeletons"
+    $skeletonsLang = Join-Path $skeletonsBase $extensao
+    $loggerSkeleton = Join-Path $skeletonsLang "Config\logger.$extensao"
 
-// Cria o diretório de logs se não existir
-const logsDir = path.join(process.cwd(), 'logs');
-
-// Formato personalizado
-const customFormat = winston.format.combine(
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.errors({ stack: true }),
-    winston.format.splat(),
-    winston.format.json()
-);
-
-// Formato para console (mais legível)
-const consoleFormat = winston.format.combine(
-    winston.format.colorize(),
-    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(({ timestamp, level, message, ...meta }) => {
-        let msg = `[${timestamp}] ${level}: ${message}`;
-        if (Object.keys(meta).length > 0) {
-            msg += ' ' + JSON.stringify(meta);
-        }
-        return msg;
-    })
-);
-
-// Cria o logger
-const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || 'info',
-    format: customFormat,
-    defaultMeta: { service: 'api' },
-    transports: [
-        // Logs de erro em arquivo separado
-        new winston.transports.File({
-            filename: path.join(logsDir, 'error.log'),
-            level: 'error',
-            maxsize: 5242880, // 5MB
-            maxFiles: 5,
-        }),
-        // Logs combinados
-        new winston.transports.File({
-            filename: path.join(logsDir, 'combined.log'),
-            maxsize: 5242880, // 5MB
-            maxFiles: 5,
-        }),
-    ],
-});
-
-// Se não estiver em produção, loga também no console
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: consoleFormat,
-    }));
-}
-
-/**
- * Middleware de logging para Express
- */
-export const requestLogger = (req, res, next) => {
-    const start = Date.now();
+    # Lê o conteúdo do skeleton
+    $conteudoLogger = Get-Content $loggerSkeleton -Raw -Encoding UTF8
     
-    // Captura quando a resposta termina
-    res.on('finish', () => {
-        const duration = Date.now() - start;
-        logger.info({
-            method: req.method,
-            url: req.originalUrl,
-            status: res.statusCode,
-            duration: `${duration}ms`,
-            ip: req.ip || req.connection.remoteAddress,
-        });
-    });
-    
-    next();
-};
-
-export default logger;
-'@
-    
-    # Cria o arquivo de logger
+    # Define o destino no projeto
     $arquivoLogger = "logger.$extensao"
     $pastaConfig = Join-Path $caminho "Config"
     $caminhoLogger = Join-Path $pastaConfig $arquivoLogger
     
+    # Cria a pasta Config se não existir
     if (-not (Test-Path -Path $pastaConfig)) {
         New-Item -Path $pastaConfig -ItemType Directory -Force | Out-Null
     }
     
     try {
+        # Cria o arquivo de logger no destino
         New-Item -Path $caminhoLogger -ItemType File -Value $conteudoLogger -Force | Out-Null
         Write-Host "  [OK] Logger criado: $caminhoLogger" -ForegroundColor Green
         
-        # Atualiza .gitignore para incluir logs
+        # Adiciona logs/ ao .gitignore para evitar commit de arquivos de log
         $gitignorePath = Join-Path $caminho ".gitignore"
         if (Test-Path $gitignorePath) {
             $gitignoreContent = Get-Content $gitignorePath -Raw

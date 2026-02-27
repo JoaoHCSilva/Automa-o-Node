@@ -17,6 +17,7 @@ Import-Module "$scriptDir\module\routesModel.psm1" -Force
 Import-Module "$scriptDir\module\templateModule.psm1" -Force
 Import-Module "$scriptDir\module\packageScriptsModule.psm1" -Force
 Import-Module "$scriptDir\module\templates\viewTemplate.psm1" -Force
+Import-Module "$scriptDir\module\templates\typesTemplate.psm1" -Force
 
 function Test-Prerequisites {
     Write-Host "Verificando pré-requisitos..." -ForegroundColor Cyan
@@ -223,8 +224,14 @@ coverage/
 .vscode/
 .idea/
 "@
-    New-Item -Path "$caminho\$nomeProjeto\.gitignore" -ItemType File -Value $gitignoreContent -Force | Out-Null
+    New-Item -Path "\.gitignore" -ItemType File -Value $gitignoreContent -Force | Out-Null
     Write-Host "Criado .gitignore" -ForegroundColor Green
+    
+    # cria os types e templates que são utilizados com typeScropt
+    if($extensoes -eq "ts"){
+        typesTemplate "$caminho\$nomeProjeto"
+    }
+
     
     # Criando o arquivo router
     routesModel -caminho "Routes" -extensao $extensaoEscolhida
