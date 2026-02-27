@@ -129,13 +129,13 @@ DB_HOST=SQLITE
 # DB_NAME=
 "@
     Write-Host "Iniciando criacao dos arquivos . . . `n"
-    $caminhoCompleto = Join-Path $caminho $nomeProjeto
+    $caminhoCompleto = "."
     # Adicionando os arquivos a raiz do projeto
-    New-Item -ItemType File -Path "$caminhoCompleto" -Name $nomeArquiApp -Value $dadosAppJs | Out-Null
+    New-Item -ItemType File -Path . -Name $nomeArquiApp -Value $dadosAppJs | Out-Null
     Write-Host "Criado $nomeArquiApp ..." -ForegroundColor White
-    New-Item -ItemType File -Path "$caminhoCompleto" -Name "README.md" -Value $readmeMd | Out-Null
+    New-Item -ItemType File -Path . -Name "README.md" -Value $readmeMd | Out-Null
     Write-Host "Criado README.md ...`n" -ForegroundColor White
-    New-Item -ItemType File -Path "$caminhoCompleto" -Name ".env.example" -Value $envExample | Out-Null
+    New-Item -ItemType File -Path . -Name ".env.example" -Value $envExample | Out-Null
     Write-Host "Criado .env.example ...`n" -ForegroundColor White
     
     # Cria o arquivo .env copiando o .env.example

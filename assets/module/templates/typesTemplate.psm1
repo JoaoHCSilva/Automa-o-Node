@@ -15,5 +15,24 @@ declare module 'express-serve-static-core' {
 
 "@
 
-    write-host  "Iniciando a criação do template Inertia.ts...`n" -ForegroundColor Yellow
+$pastaTypes = "$caminho\types"
+
+if(-not(Test-Path -Path $pastaTypes)){
+    Write-Host "  [AVISO] Pasta Types nao existe em: $pastaTypes" -ForegroundColor Yellow
+    Write-Host "  Criando pasta Types..." -ForegroundColor Yellow
+    New-Item -Path $pastaTypes -ItemType Directory -Force | Out-Null
 }
+
+try {
+    
+    New-Item -ItemType File -Path $pastaTypes -Value $templateInertia -Force | Out-Null
+    Write-Host "  [OK] Inertia types criada com sucesso" -ForegroundColor Green
+        return $true
+}
+catch {
+    Write-Host "  [ERRO] Erro ao criar Inertia Types: $_" -ForegroundColor Red
+    return $false
+}
+
+}
+Export-ModuleMember -Functio typesTemplate
