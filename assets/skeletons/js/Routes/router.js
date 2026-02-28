@@ -11,21 +11,31 @@ const router = Router();
 router.use(logMiddleware);
 
 // =====================================================
-// ROTAS PÚBLICAS (sem autenticação)
+// ROTAS DE PÁGINA (Inertia.js — renderização server-driven)
 // =====================================================
 
-// Rota raiz — retorna informações básicas da API
+// Home — renderiza o componente Index via Inertia
 router.get("/", (req, res) => {
-    res.json({
-        message: "API funcionando!",
-        version: "1.0.0",
-        endpoints: {
-            users: "/api/users"
+    req.inertia.render({
+        component: 'Index',
+        props: {
+            titulo: 'Bem-vindo!',
+            descricao: 'Aplicação fullstack com Express + Inertia.js',
         }
     });
 });
 
-// Health check — usado por load balancers e monitoramento
+// Sobre — renderiza o componente About via Inertia
+router.get("/about", (req, res) => {
+    req.inertia.render({
+        component: 'About',
+        props: {
+            versao: '1.0.0',
+        }
+    });
+});
+
+// Health check — API REST (sem Inertia)
 router.get("/health", (req, res) => {
     res.json({
         status: "OK",
