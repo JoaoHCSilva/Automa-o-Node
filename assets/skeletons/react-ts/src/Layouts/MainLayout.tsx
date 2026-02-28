@@ -1,6 +1,7 @@
 // MainLayout.tsx — Layout persistente da aplicação React (TypeScript)
 // Header fixo com backdrop blur + conteúdo full-width
 
+import './MainLayout.css'
 import { Link } from '@inertiajs/react'
 import type { ReactNode } from 'react'
 

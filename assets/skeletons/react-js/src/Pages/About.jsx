@@ -1,4 +1,5 @@
 // Pages/About.jsx — Página Sobre (estilo dark premium)
+import './About.css'
 import { Head, Link } from '@inertiajs/react'
 
 export default function About({ versao = '1.0.0' }) {

@@ -1,6 +1,6 @@
 // main.tsx — Bootstrap da aplicação React com Inertia.js (TypeScript)
 
-import './app.css'
+import './skeleton.css'
 import { createInertiaApp } from '@inertiajs/react'
 import { createRoot } from 'react-dom/client'
 import type { ComponentType, ReactNode } from 'react'
@@ -18,6 +18,7 @@ createInertiaApp({
     const page = pages[`./Pages/${name}.tsx`]
 
     if (!page) {
+      console.error(`[Inertia] Página "${name}" não encontrada. Páginas disponíveis:`, Object.keys(pages))
       throw new Error(`Página "${name}" não encontrada em ./Pages/`)
     }
 

@@ -1,6 +1,7 @@
 // MainLayout.jsx — Layout persistente da aplicação React
 // Header fixo com backdrop blur + conteúdo full-width
 
+import './MainLayout.css'
 import { Link } from '@inertiajs/react'
 
 export default function MainLayout({ children }) {

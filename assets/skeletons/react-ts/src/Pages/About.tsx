@@ -1,4 +1,5 @@
 // Pages/About.tsx — Página Sobre (estilo dark premium)
+import './About.css'
 import { Head, Link } from '@inertiajs/react'
 
 interface AboutProps {

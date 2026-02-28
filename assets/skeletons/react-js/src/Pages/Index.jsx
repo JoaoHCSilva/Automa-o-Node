@@ -1,4 +1,5 @@
 // Pages/Index.jsx — Welcome page React (estilo dark premium)
+import './Index.css'
 import { Head } from "@inertiajs/react";
 
 export default function Index({

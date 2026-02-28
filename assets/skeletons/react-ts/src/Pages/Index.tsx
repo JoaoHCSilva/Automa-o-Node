@@ -1,4 +1,5 @@
 // Pages/Index.tsx — Welcome page React (estilo dark premium)
+import './Index.css'
 import { Head } from '@inertiajs/react'
 
 interface IndexProps {
