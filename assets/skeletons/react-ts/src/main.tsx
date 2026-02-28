@@ -1,5 +1,6 @@
 // main.tsx — Bootstrap da aplicação React com Inertia.js (TypeScript)
 
+import './app.css'
 import { createInertiaApp } from '@inertiajs/react'
 import { createRoot } from 'react-dom/client'
 import type { ComponentType, ReactNode } from 'react'

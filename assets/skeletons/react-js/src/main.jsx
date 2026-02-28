@@ -1,5 +1,6 @@
 // main.jsx — Bootstrap da aplicação React com Inertia.js
 
+import './app.css'
 import { createInertiaApp } from '@inertiajs/react'
 import { createRoot } from 'react-dom/client'
 import MainLayout from './Layouts/MainLayout'

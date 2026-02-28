@@ -3,54 +3,46 @@ import { Head } from '@inertiajs/react'
 
 export default function Index({ titulo = 'Minha App', descricao = 'Aplicação fullstack com Express + Inertia.js' }) {
     return (
-        <>
+        <div style={styles.page}>
             <Head title="Bem-vindo" />
-            <div style={styles.page}>
-                <section style={styles.hero}>
-                    <div style={styles.heroGlow}></div>
-                    <div style={styles.heroContent}>
-                        <div style={styles.logoMark}>
-                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
-                                <path d="M24 4L6 14v20l18 10 18-10V14L24 4z" stroke="url(#g1)" strokeWidth="2" fill="none"/>
-                                <path d="M24 4v40M6 14l18 10 18-10M6 34l18-10 18 10" stroke="url(#g1)" strokeWidth="2" opacity="0.5"/>
-                                <defs><linearGradient id="g1" x1="0" y1="0" x2="48" y2="48"><stop stopColor="#f97316"/><stop offset="1" stopColor="#ef4444"/></linearGradient></defs>
-                            </svg>
-                        </div>
-                        <h1 style={styles.heroTitle}>{titulo}</h1>
-                        <p style={styles.heroSubtitle}>{descricao}</p>
-                        <div style={styles.heroActions}>
-                            <a href="https://inertiajs.com" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnPrimary}}>Documentação</a>
-                            <a href="https://github.com/JoaoHCSilva/Automa-o-Node" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnOutline}}>GitHub</a>
-                        </div>
+            <section style={styles.hero}>
+                <div style={styles.heroGlow}></div>
+                <div style={styles.heroContent}>
+                    <div style={styles.logoMark}>
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width: '100%', height: '100%' }}>
+                            <path d="M24 4L6 14v20l18 10 18-10V14L24 4z" stroke="url(#g1)" strokeWidth="2" fill="none"/>
+                            <path d="M24 4v40M6 14l18 10 18-10M6 34l18-10 18 10" stroke="url(#g1)" strokeWidth="2" opacity="0.5"/>
+                            <defs><linearGradient id="g1" x1="0" y1="0" x2="48" y2="48"><stop stopColor="#f97316"/><stop offset="1" stopColor="#ef4444"/></linearGradient></defs>
+                        </svg>
                     </div>
-                </section>
+                    <h1 style={styles.heroTitle}>{titulo}</h1>
+                    <p style={styles.heroSubtitle}>{descricao}</p>
+                    <div style={styles.heroActions}>
+                        <a href="https://inertiajs.com" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnPrimary}}>Documentação</a>
+                        <a href="https://github.com/JoaoHCSilva/Automa-o-Node" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnOutline}}>GitHub</a>
+                    </div>
+                </div>
+            </section>
 
-                <section style={styles.features}>
-                    {[
-                        { icon: '⚡', title: 'Vite', desc: 'Build ultrarrápido com Hot Module Replacement para desenvolvimento ágil.' },
-                        { icon: '🔗', title: 'Inertia.js', desc: 'SPA moderna sem API — o servidor controla a navegação, o cliente renderiza.' },
-                        { icon: '⚛️', title: 'React', desc: 'Biblioteca declarativa com hooks, component-based architecture e ecossistema vasto.' },
-                        { icon: '🚀', title: 'Express', desc: 'Framework minimalista e flexível para Node.js, rápido e descomplicado.' },
-                    ].map(f => (
-                        <div key={f.title} style={styles.featureCard} className="feature-card">
-                            <div style={styles.featureIcon}>{f.icon}</div>
-                            <h3 style={styles.featureTitle}>{f.title}</h3>
-                            <p style={styles.featureDesc}>{f.desc}</p>
-                        </div>
-                    ))}
-                </section>
+            <section style={styles.features}>
+                {[
+                    { icon: '⚡', title: 'Vite', desc: 'Build ultrarrápido com Hot Module Replacement para desenvolvimento ágil.' },
+                    { icon: '🔗', title: 'Inertia.js', desc: 'SPA moderna sem API — o servidor controla a navegação, o cliente renderiza.' },
+                    { icon: '⚛️', title: 'React', desc: 'Biblioteca declarativa com hooks, component-based architecture e ecossistema vasto.' },
+                    { icon: '🚀', title: 'Express', desc: 'Framework minimalista e flexível para Node.js, rápido e descomplicado.' },
+                ].map(f => (
+                    <div key={f.title} style={styles.featureCard} className="feature-card">
+                        <div style={styles.featureIcon}>{f.icon}</div>
+                        <h3 style={styles.featureTitle}>{f.title}</h3>
+                        <p style={styles.featureDesc}>{f.desc}</p>
+                    </div>
+                ))}
+            </section>
 
-                <footer style={styles.footer}>
-                    <p style={styles.footerText}>Express + Inertia.js + React · v1.0.0</p>
-                </footer>
-            </div>
-
-            <style>{`
-                @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-                .feature-card:hover { border-color: #333 !important; background: #1a1a1a !important; transform: translateY(-2px); }
-            `}</style>
-        </>
+            <footer style={styles.footer}>
+                <p style={styles.footerText}>Express + Inertia.js + React · v1.0.0</p>
+            </footer>
+        </div>
     )
 }
 
