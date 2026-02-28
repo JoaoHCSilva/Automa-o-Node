@@ -12,6 +12,18 @@ interface PageModule {
   }
 }
 
+// Fallback para desenvolvimento sem backend (npm run dev apenas com Vite)
+// Em produção, o Express injeta data-page automaticamente via Inertia
+const appEl = document.getElementById('app')
+if (appEl && !appEl.dataset.page) {
+  appEl.dataset.page = JSON.stringify({
+    component: 'Index',
+    props: { titulo: 'Modo Desenvolvimento', descricao: 'Backend Express não conectado. Execute npm run dev:fullstack para o fluxo completo.' },
+    url: '/',
+    version: null
+  })
+}
+
 createInertiaApp({
   resolve: (name: string) => {
     const pages = import.meta.glob<PageModule>('./Pages/**/*.tsx', { eager: true })
