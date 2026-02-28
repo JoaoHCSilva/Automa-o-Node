@@ -32,38 +32,47 @@ const corsOptions = {
     credentials: true
 };
 
-// Registra middlewares globais na ordem correta
-app.use(limiter);
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(requestLogger); // Logger de requisições HTTP
+// Inicializa a aplicação dentro de uma função async
+// (necessário para await do middleware Inertia)
+async function bootstrap() {
+    // Registra middlewares globais na ordem correta
+    app.use(limiter);
+    app.use(cors(corsOptions));
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    app.use(requestLogger); // Logger de requisições HTTP
 
-// Sessão necessária para flash messages e estado do Inertia
-app.use(session({
-  secret: 'sua_chave_secreta',
-  resave: false,
-  saveUninitialized: false,
-}));
+    // Sessão necessária para flash messages e estado do Inertia
+    app.use(session({
+        secret: process.env.SESSION_SECRET || 'sua_chave_secreta',
+        resave: false,
+        saveUninitialized: false,
+    }));
 
-// Integração com Inertia.js para SSR/CSR híbrido
-app.use(await inertia({
-  rootElementId: 'app',
-  assetsVersion: 'v1',
-}));
+    // Integração com Inertia.js para SSR/CSR híbrido
+    app.use(await inertia({
+        rootElementId: 'app',
+        assetsVersion: 'v1',
+    }));
 
-// Monta todas as rotas da aplicação
-app.use(routes);
+    // Monta todas as rotas da aplicação
+    app.use(routes);
 
-// Handler de erros deve ser o último middleware registrado
-app.use(errorHandler);
+    // Handler de erros deve ser o último middleware registrado
+    app.use(errorHandler);
 
-// Inicia o servidor e exibe informações no console
-app.listen(PORT, () => {
-    logger.info('========================================');
-    logger.info('  Servidor rodando com sucesso!');
-    logger.info('========================================');
-    logger.info('  URL: http://localhost:' + PORT);
-    logger.info('  Ambiente: ' + (process.env.NODE_ENV || 'development'));
-    logger.info('========================================');
+    // Inicia o servidor e exibe informações no console
+    app.listen(PORT, () => {
+        logger.info('========================================');
+        logger.info('  Servidor rodando com sucesso!');
+        logger.info('========================================');
+        logger.info('  URL: http://localhost:' + PORT);
+        logger.info('  Ambiente: ' + (process.env.NODE_ENV || 'development'));
+        logger.info('========================================');
+    });
+}
+
+bootstrap().catch((err) => {
+    logger.error('Falha ao iniciar servidor:', err);
+    process.exit(1);
 });

@@ -42,10 +42,10 @@ function Add-BackendScripts {
         
         # Define scripts baseados na extensão
         # tsx: compilação instantânea via esbuild (substitui ts-node)
-        # node --watch: hot-reload nativo do Node 22+ (substitui nodemon)
+        # node --watch: hot-reload nativo do Node 22+ (monitora apenas arquivos importados)
         if ($extensao -eq "ts") {
             $serverScript = "tsx app.ts"
-            $devBackendScript = "node --watch --import tsx app.ts"
+            $devBackendScript = "tsx watch app.ts"
         }
         else {
             $serverScript = "node app.js"
