@@ -120,6 +120,13 @@ function Copy-FrontendSkeleton {
     # Remove arquivos desnecessários do Vite default
     $arquivosRemover = @()
 
+    # Remove o index.html do Vite (Inertia gera o HTML via Express middleware)
+    $viteIndexHtml = Join-Path $caminho "index.html"
+    if (Test-Path $viteIndexHtml) {
+        Remove-Item -Path $viteIndexHtml -Force
+        Write-Host "  [REMOVIDO] index.html (Inertia usa HTML gerado pelo Express)" -ForegroundColor DarkGray
+    }
+
     if ($isVanilla) {
         # Vanilla: remove o counter.js e javascript.svg padrão do Vite
         $arquivosRemover = @(
