@@ -1,103 +1,284 @@
 <script setup lang="ts">
-// Index.vue — Página inicial com props tipadas (TypeScript)
-// Rota correspondente no Express: req.inertia.render('Index', { titulo, descricao })
-
-import { Head, Link } from "@inertiajs/vue3";
+import { Head } from "@inertiajs/vue3";
 import type { IndexPageProps } from "../types";
 
-const props = withDefaults(defineProps<IndexPageProps>(), {
-  titulo: "Bem-vindo",
-  descricao: "Aplicação criada com Express + Inertia.js + Vue 3",
+withDefaults(defineProps<IndexPageProps>(), {
+  titulo: "Minha App",
+  descricao: "Aplicação fullstack com Express + Inertia.js",
 });
 </script>
 
 <template>
-  <div class="page-index">
-    <Head title="Home" />
+  <Head title="Bem-vindo" />
 
+  <div class="welcome-page">
     <section class="hero">
-      <h1>{{ titulo }}</h1>
-      <p class="hero-desc">{{ descricao }}</p>
-      <Link href="/about" class="btn-primary">Saiba mais</Link>
+      <div class="hero-glow"></div>
+      <div class="hero-content">
+        <div class="logo-mark">
+          <svg
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M24 4L6 14v20l18 10 18-10V14L24 4z"
+              stroke="url(#g1)"
+              stroke-width="2"
+              fill="none"
+            />
+            <path
+              d="M24 4v40M6 14l18 10 18-10M6 34l18-10 18 10"
+              stroke="url(#g1)"
+              stroke-width="2"
+              opacity="0.5"
+            />
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="48" y2="48">
+                <stop stop-color="#f97316" />
+                <stop offset="1" stop-color="#ef4444" />
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <h1 class="hero-title">{{ titulo }}</h1>
+        <p class="hero-subtitle">{{ descricao }}</p>
+        <div class="hero-actions">
+          <a
+            href="https://inertiajs.com"
+            target="_blank"
+            class="btn btn-primary"
+            >Documentação</a
+          >
+          <a href="https://github.com" target="_blank" class="btn btn-outline"
+            >GitHub</a
+          >
+        </div>
+      </div>
     </section>
 
     <section class="features">
       <div class="feature-card">
-        <h3>⚡ Vite</h3>
-        <p>Build ultrarrápido com HMR instantâneo</p>
+        <div class="feature-icon">⚡</div>
+        <h3>Vite</h3>
+        <p>
+          Build ultrarrápido com Hot Module Replacement para desenvolvimento
+          ágil.
+        </p>
       </div>
       <div class="feature-card">
-        <h3>🔗 Inertia.js</h3>
-        <p>SPA sem API — renderização server-driven</p>
+        <div class="feature-icon">🔗</div>
+        <h3>Inertia.js</h3>
+        <p>
+          SPA moderna sem API — o servidor controla a navegação, o cliente
+          renderiza.
+        </p>
       </div>
       <div class="feature-card">
-        <h3>🟢 Vue 3</h3>
-        <p>Composition API com reatividade moderna</p>
+        <div class="feature-icon">💚</div>
+        <h3>Vue 3</h3>
+        <p>Composition API com reatividade moderna e ecossistema robusto.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🚀</div>
+        <h3>Express</h3>
+        <p>
+          Framework minimalista e flexível para Node.js, rápido e descomplicado.
+        </p>
       </div>
     </section>
+
+    <footer class="welcome-footer">
+      <p>Express + Inertia.js + Vue 3 · v1.0.0</p>
+    </footer>
   </div>
 </template>
 
 <style scoped>
+.welcome-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #e5e5e5;
+  font-family:
+    "Inter",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
 .hero {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 6rem 2rem 4rem;
+}
+
+.hero-glow {
+  position: absolute;
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(
+    ellipse,
+    rgba(249, 115, 22, 0.12) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.hero-content {
   text-align: center;
-  padding: 4rem 0 3rem;
+  max-width: 640px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.8s ease-out;
 }
 
-.hero h1 {
-  font-size: 2.5rem;
-  color: #e94560;
-  margin-bottom: 0.75rem;
+.logo-mark {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 2rem;
+  animation: float 6s ease-in-out infinite;
 }
 
-.hero-desc {
-  color: #aaa;
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
+.logo-mark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff 0%, #a3a3a3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1rem;
+  line-height: 1.1;
+}
+
+.hero-subtitle {
+  font-size: 1.125rem;
+  color: #737373;
+  line-height: 1.6;
+  margin: 0 0 2.5rem;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.75rem 1.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .btn-primary {
-  display: inline-block;
-  background-color: #e94560;
+  background: linear-gradient(135deg, #f97316, #ef4444);
   color: #fff;
-  padding: 0.75rem 2rem;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background-color 0.2s;
+  border: none;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
 }
 
 .btn-primary:hover {
-  background-color: #c73652;
+  box-shadow: 0 6px 24px rgba(249, 115, 22, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: #d4d4d4;
+  border: 1px solid #333;
+}
+.btn-outline:hover {
+  border-color: #555;
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .features {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  padding: 2rem 0;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  max-width: 900px;
+  width: 100%;
+  padding: 2rem;
+  animation: fadeUp 0.8s ease-out 0.2s both;
 }
 
 .feature-card {
-  background-color: #16213e;
-  border: 1px solid #1a1a2e;
-  border-radius: 6px;
-  padding: 1.5rem;
-  transition: transform 0.2s;
+  background: #141414;
+  border: 1px solid #1f1f1f;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  transition: all 0.3s ease;
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
+  border-color: #333;
+  background: #1a1a1a;
+  transform: translateY(-2px);
 }
-
+.feature-icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+}
 .feature-card h3 {
-  margin-bottom: 0.5rem;
-  color: #eee;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f5f5f5;
+  margin: 0 0 0.5rem;
+}
+.feature-card p {
+  font-size: 0.8125rem;
+  color: #737373;
+  line-height: 1.5;
+  margin: 0;
 }
 
-.feature-card p {
-  color: #999;
-  font-size: 0.9rem;
-  line-height: 1.5;
+.welcome-footer {
+  margin-top: auto;
+  padding: 2rem;
+  text-align: center;
+}
+.welcome-footer p {
+  font-size: 0.75rem;
+  color: #404040;
+  margin: 0;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 </style>

@@ -1,5 +1,5 @@
-<script setup lang="ts">
-// MainLayout.vue — Layout persistente da aplicação (TypeScript)
+<script setup>
+// MainLayout.vue — Layout persistente da aplicação
 // Mantém o menu de navegação entre transições de página
 
 import { Link } from "@inertiajs/vue3";
@@ -26,12 +26,6 @@ import { Link } from "@inertiajs/vue3";
     <main class="app-content">
       <slot />
     </main>
-
-    <footer class="app-footer">
-      <p>
-        &copy; {{ new Date().getFullYear() }} — Construído com Inertia.js + Vue
-      </p>
-    </footer>
   </div>
 </template>
 
@@ -40,10 +34,18 @@ import { Link } from "@inertiajs/vue3";
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #0a0a0a;
 }
 
 .app-header {
-  background-color: #1a1a2e;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1f1f1f;
   padding: 0 2rem;
 }
 
@@ -53,14 +55,15 @@ import { Link } from "@inertiajs/vue3";
   justify-content: space-between;
   max-width: 1200px;
   margin: 0 auto;
-  height: 64px;
+  height: 56px;
 }
 
 .brand-link {
-  color: #e94560;
-  font-size: 1.25rem;
+  color: #f97316;
+  font-size: 1.1rem;
   font-weight: 700;
   text-decoration: none;
+  letter-spacing: -0.02em;
 }
 
 .nav-links {
@@ -72,29 +75,19 @@ import { Link } from "@inertiajs/vue3";
 }
 
 .nav-link {
-  color: #eee;
+  color: #a3a3a3;
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   transition: color 0.2s;
 }
 
 .nav-link:hover {
-  color: #e94560;
+  color: #f5f5f5;
 }
 
 .app-content {
   flex: 1;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-.app-footer {
-  background-color: #16213e;
-  color: #888;
-  text-align: center;
-  padding: 1rem 2rem;
-  font-size: 0.85rem;
+  padding-top: 56px; /* Compensa o header fixo */
 }
 </style>
