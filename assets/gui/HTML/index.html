@@ -121,21 +121,22 @@
                     <p class="card-description">Escolha o framework do frontend. A variante JS/TS é definida pela linguagem escolhida.</p>
                 </div>
                 <div class="card-body">
-                    <div class="template-grid">
-                        <div class="option-card template-option" data-value="0" onclick="selecionarOpcao(this, 'template')">
+                    <div class="template-grid" style="display: flex;
+                flex-direction: row; gap: 12px; justify-content: center; align-items: center;">
+                        <div class="option-card template-option" style="min-width: 150px; max-width: 150px;" data-value="0" onclick="selecionarOpcao(this, 'template')">
                             <div class="option-icon">⚛️</div>
                             <div class="option-title">React</div>
-                            <div class="option-desc">Com Inertia.js</div>
+                            <div class="option-desc" style="text-align: center;">Com Inertia.js</div>
                         </div>
-                        <div class="option-card template-option" data-value="1" onclick="selecionarOpcao(this, 'template')">
+                        <div class="option-card template-option" style="min-width: 150px; max-width: 150px;" data-value="1" onclick="selecionarOpcao(this, 'template')">
                             <div class="option-icon">💚</div>
                             <div class="option-title">Vue</div>
-                            <div class="option-desc">Com Inertia.js</div>
+                            <div class="option-desc" style="text-align: center;">Com Inertia.js</div>
                         </div>
-                        <div class="option-card template-option" data-value="2" onclick="selecionarOpcao(this, 'template')">
+                        <div class="option-card template-option" style="min-width: 150px; max-width: 150px;" data-value="2" onclick="selecionarOpcao(this, 'template')">
                             <div class="option-icon">📄</div>
                             <div class="option-title">Vanilla</div>
-                            <div class="option-desc">REST API (sem framework)</div>
+                            <div class="option-desc" style="text-align: center;">Sem Inertia.js</div>
                         </div>
                     </div>
                 </div>

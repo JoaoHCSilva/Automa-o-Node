@@ -46,7 +46,8 @@ function Add-BackendScripts {
         if ($extensao -eq "ts") {
             $serverScript = "tsx app.ts"
             $devBackendScript = "node --watch --import tsx app.ts"
-        } else {
+        }
+        else {
             $serverScript = "node app.js"
             $devBackendScript = "node --watch app.js"
         }
@@ -59,7 +60,8 @@ function Add-BackendScripts {
         # Preserva scripts do Vite e adiciona scripts de backend
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "server" -Value $serverScript -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:backend" -Value $devBackendScript -Force
-        $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:frontend" -Value ($packageJson.scripts.dev ?? "vite") -Force
+        $devFrontendScript = if ($packageJson.scripts.dev) { $packageJson.scripts.dev } else { "vite" }
+        $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:frontend" -Value $devFrontendScript -Force
         
         # Script fullstack: roda frontend e backend simultaneamente (requer concurrently)
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:fullstack" -Value "concurrently `"npm run dev:backend`" `"npm run dev:frontend`"" -Force
