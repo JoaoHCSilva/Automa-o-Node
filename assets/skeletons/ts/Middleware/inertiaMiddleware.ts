@@ -1,0 +1,64 @@
+// inertiaMiddleware.ts — Middleware Inertia.js simplificado para Express
+// Implementa o protocolo Inertia sem depender de pacotes externos
+
+import type { Request, Response, NextFunction } from "express";
+
+interface InertiaRenderOptions {
+    component: string;
+    props?: Record<string, unknown>;
+}
+
+const VITE_PORT = process.env.VITE_PORT || 5173;
+const isDev = process.env.NODE_ENV !== 'production';
+
+// Gera o HTML shell com data-page para o Inertia
+function generateHtml(page: Record<string, unknown>): string {
+    const pageJson = JSON.stringify(page).replace(/'/g, '&#039;');
+
+    const scripts = isDev
+        ? `<script type="module" src="http://localhost:${VITE_PORT}/@vite/client"></script>
+           <script type="module" src="http://localhost:${VITE_PORT}/src/main.ts"></script>`
+        : `<script type="module" src="/assets/main.js"></script>
+           <link rel="stylesheet" href="/assets/main.css">`;
+
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha App</title>
+</head>
+<body>
+    <div id="app" data-page='${pageJson}'></div>
+    ${scripts}
+</body>
+</html>`;
+}
+
+// Middleware que adiciona res.inertia ao Express
+export function inertiaMiddleware(req: Request, res: Response, next: NextFunction) {
+    const isInertiaRequest = req.headers['x-inertia'] === 'true';
+
+    (res as any).inertia = {
+        render(component: string, props: Record<string, unknown> = {}) {
+            const page = {
+                component,
+                props,
+                url: req.originalUrl,
+                version: '1',
+            };
+
+            if (isInertiaRequest) {
+                // Requisição Inertia (navegação SPA): retorna JSON
+                res.setHeader('X-Inertia', 'true');
+                res.setHeader('Vary', 'X-Inertia');
+                return res.json(page);
+            }
+
+            // Primeira visita: retorna HTML completo com data-page
+            res.type('html').send(generateHtml(page));
+        }
+    };
+
+    next();
+}

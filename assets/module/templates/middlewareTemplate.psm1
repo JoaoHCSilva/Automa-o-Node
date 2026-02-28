@@ -45,13 +45,23 @@ function New-ExampleMiddleware {
     try {
         New-Item -Path $caminhoCompleto -ItemType File -Value $conteudoMiddleware -Force | Out-Null
         Write-Host "  [OK] Middleware criado: $caminhoCompleto" -ForegroundColor Green
-        return $true
     }
     catch {
         Write-Host "  [ERRO] Erro ao criar Middleware: $_" -ForegroundColor Red
         Write-Host "  Caminho tentado: $caminhoCompleto" -ForegroundColor Red
         return $false
     }
+
+    # Copia o inertiaMiddleware (protocolo Inertia.js para Express)
+    $inertiaSkeleton = Join-Path $skeletonsLang "Middleware\inertiaMiddleware.$extensao"
+    if (Test-Path $inertiaSkeleton) {
+        $conteudoInertia = Get-Content $inertiaSkeleton -Raw -Encoding UTF8
+        $caminhoInertia = "$pastaMiddleware\inertiaMiddleware.$extensao"
+        New-Item -Path $caminhoInertia -ItemType File -Value $conteudoInertia -Force | Out-Null
+        Write-Host "  [OK] InertiaMiddleware criado: $caminhoInertia" -ForegroundColor Green
+    }
+
+    return $true
 }
 
 Export-ModuleMember -Function New-ExampleMiddleware

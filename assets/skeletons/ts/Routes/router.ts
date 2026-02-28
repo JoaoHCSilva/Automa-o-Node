@@ -17,22 +17,16 @@ router.use(logMiddleware);
 
 // Home — renderiza o componente Index via Inertia
 router.get("/", (req: Request, res: Response) => {
-    (req as any).inertia.render({
-        component: 'Index',
-        props: {
-            titulo: 'Bem-vindo!',
-            descricao: 'Aplicação fullstack com Express + Inertia.js',
-        }
+    (res as any).inertia.render('Index', {
+        titulo: 'Bem-vindo!',
+        descricao: 'Aplicação fullstack com Express + Inertia.js',
     });
 });
 
 // Sobre — renderiza o componente About via Inertia
 router.get("/about", (req: Request, res: Response) => {
-    (req as any).inertia.render({
-        component: 'About',
-        props: {
-            versao: '1.0.0',
-        }
+    (res as any).inertia.render('About', {
+        versao: '1.0.0',
     });
 });
 
