@@ -6,7 +6,7 @@ export const estado = {
     nomeProjeto: '',
     caminho: '',
     linguagem: -1,     // 0 = JS, 1 = TS
-    template: -1,      // 0-10 (índice do template Vite)
+    template: -1,      // 0 = React, 1 = Vue, 2 = Vanilla
     caminhoFinal: '',   // Preenchido após criação
     executando: false
 };

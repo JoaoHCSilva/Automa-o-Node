@@ -18,7 +18,7 @@ Import-Module "$scriptDir\module\templateModule.psm1" -Force
 Import-Module "$scriptDir\module\packageScriptsModule.psm1" -Force
 Import-Module "$scriptDir\module\templates\viewTemplate.psm1" -Force
 Import-Module "$scriptDir\module\templates\typesTemplate.psm1" -Force
-Import-Module "$scriptDir\module\templates\vueInertiaTemplate.psm1" -Force
+Import-Module "$scriptDir\module\templates\frontendSkeletonModule.psm1" -Force
 
 function Test-Prerequisites {
     Write-Host "Verificando pré-requisitos..." -ForegroundColor Cyan
@@ -253,17 +253,31 @@ coverage/
     
     New-ProjectTemplates -caminho $caminhoAtual -extensao $extensaoEscolhida
     
-    # Pergunta o template que será utilizado
-    $templates = @("vanilla", "vanilla-ts", "vue", "vue-ts", "react", "react-ts", "preact", "lit", "svelte", "solid", "qwik")
-    $hotkeys = @("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
-    $opcoesTemplates = for ($i = 0; $i -lt $templates.Count; $i++) {
-        New-Object System.Management.Automation.Host.ChoiceDescription ("&$($hotkeys[$i]) $($templates[$i])", $templates[$i])
-    }
-    $escolha = $host.UI.PromptForChoice("Template", "Selecione o template do projeto:", $opcoesTemplates, 0)
-    $templateEscolhido = $templates[$escolha]
-    Write-Host "O projeto será desenvolvido com base no template: $($templates[$escolha])" -ForegroundColor Yellow
+    # Seleciona o framework frontend (variante JS/TS é determinada pela escolha anterior)
+    $opcoesFw = [System.Management.Automation.Host.ChoiceDescription[]] @(
+        (New-Object System.Management.Automation.Host.ChoiceDescription "&React", "React com Inertia.js"),
+        (New-Object System.Management.Automation.Host.ChoiceDescription "&Vue", "Vue 3 com Inertia.js"),
+        (New-Object System.Management.Automation.Host.ChoiceDescription "V&anilla", "Vanilla (sem framework, REST API)")
+    )
+    $escolhaFw = $host.UI.PromptForChoice("Framework Frontend", "Selecione o framework do frontend:", $opcoesFw, 0)
 
-    # inicia o vite
+    # Mapeia a escolha para o nome base do template Vite
+    $frameworksBase = @("react", "vue", "vanilla")
+    $frameworksNomes = @("React", "Vue", "Vanilla")
+    $frameworkBase = $frameworksBase[$escolhaFw]
+    $frameworkNome = $frameworksNomes[$escolhaFw]
+
+    # Combina framework + extensão para determinar o template do Vite
+    if ($extensaoEscolhida -eq "ts") {
+        $templateEscolhido = "$frameworkBase-ts"
+    }
+    else {
+        $templateEscolhido = $frameworkBase
+    }
+
+    Write-Host "O projeto será desenvolvido com: $frameworkNome ($extensaoEscolhida)" -ForegroundColor Yellow
+
+    # Inicia o Vite com o template correto
     try {
         instalarVite $nomeProjeto $templateEscolhido
         Write-Host "Instalado Vite com sucesso!" -ForegroundColor Green
@@ -276,19 +290,17 @@ coverage/
         return
     }
 
-    # Copia skeleton Vue + Inertia.js quando o template for vue ou vue-ts
-    if ($templateEscolhido -eq "vue" -or $templateEscolhido -eq "vue-ts") {
-        try {
-            Copy-VueSkeleton -caminho $caminhoCompleto -template $templateEscolhido
-        }
-        catch {
-            Write-Host "[AVISO] Falha ao copiar skeleton Vue/Inertia: $_" -ForegroundColor Yellow
-        }
+    # Copia skeleton frontend (React/Vue/Vanilla) para o projeto
+    try {
+        Copy-FrontendSkeleton -caminho $caminhoCompleto -template $templateEscolhido
+    }
+    catch {
+        Write-Host "[AVISO] Falha ao copiar skeleton frontend: $_" -ForegroundColor Yellow
     }
     
-    # instala as dependecias do projeto
+    # Instala as dependências do projeto (passando o template para deps condicionais)
     try {
-        installDependencies
+        installDependencies -template $templateEscolhido
     }
     catch {
         Write-Host "[ERRO] Falha ao instalar dependências: $_" -ForegroundColor Red
