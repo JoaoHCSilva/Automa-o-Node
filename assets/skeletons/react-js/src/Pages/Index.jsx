@@ -6,7 +6,6 @@ export default function Index({ titulo = 'Minha App', descricao = 'Aplicação f
         <>
             <Head title="Bem-vindo" />
             <div style={styles.page}>
-                {/* Hero */}
                 <section style={styles.hero}>
                     <div style={styles.heroGlow}></div>
                     <div style={styles.heroContent}>
@@ -21,12 +20,11 @@ export default function Index({ titulo = 'Minha App', descricao = 'Aplicação f
                         <p style={styles.heroSubtitle}>{descricao}</p>
                         <div style={styles.heroActions}>
                             <a href="https://inertiajs.com" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnPrimary}}>Documentação</a>
-                            <a href="https://github.com" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnOutline}}>GitHub</a>
+                            <a href="https://github.com/JoaoHCSilva/Automa-o-Node" target="_blank" rel="noreferrer" style={{...styles.btn, ...styles.btnOutline}}>GitHub</a>
                         </div>
                     </div>
                 </section>
 
-                {/* Features */}
                 <section style={styles.features}>
                     {[
                         { icon: '⚡', title: 'Vite', desc: 'Build ultrarrápido com Hot Module Replacement para desenvolvimento ágil.' },
@@ -57,7 +55,7 @@ export default function Index({ titulo = 'Minha App', descricao = 'Aplicação f
 }
 
 const styles = {
-    page: { minHeight: '100vh', background: '#0a0a0a', color: '#e5e5e5', fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif", display: 'flex', flexDirection: 'column', alignItems: 'center', overflowX: 'hidden' },
+    page: { minHeight: '100vh', background: '#0a0a0a', color: '#e5e5e5', fontFamily: "'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif", display: 'flex', flexDirection: 'column', alignItems: 'center' },
     hero: { position: 'relative', width: '100%', display: 'flex', justifyContent: 'center', padding: '6rem 2rem 4rem' },
     heroGlow: { position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '400px', background: 'radial-gradient(ellipse, rgba(249, 115, 22, 0.12) 0%, transparent 70%)', pointerEvents: 'none' },
     heroContent: { textAlign: 'center', maxWidth: '640px', position: 'relative', zIndex: 1, animation: 'fadeUp 0.8s ease-out' },
@@ -68,7 +66,7 @@ const styles = {
     btn: { padding: '0.75rem 1.75rem', borderRadius: '9999px', fontSize: '0.875rem', fontWeight: 600, textDecoration: 'none', transition: 'all 0.2s ease' },
     btnPrimary: { background: 'linear-gradient(135deg, #f97316, #ef4444)', color: '#fff', border: 'none', boxShadow: '0 4px 16px rgba(249, 115, 22, 0.3)' },
     btnOutline: { background: 'transparent', color: '#d4d4d4', border: '1px solid #333' },
-    features: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', maxWidth: '900px', width: '100%', padding: '2rem', animation: 'fadeUp 0.8s ease-out 0.2s both' },
+    features: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', maxWidth: '900px', width: '100%', padding: '0 2rem 2rem', animation: 'fadeUp 0.8s ease-out 0.2s both' },
     featureCard: { background: '#141414', border: '1px solid #1f1f1f', borderRadius: '16px', padding: '2rem 1.5rem', transition: 'all 0.3s ease', cursor: 'default' },
     featureIcon: { fontSize: '1.75rem', marginBottom: '0.75rem' },
     featureTitle: { fontSize: '1rem', fontWeight: 700, color: '#f5f5f5', margin: '0 0 0.5rem' },

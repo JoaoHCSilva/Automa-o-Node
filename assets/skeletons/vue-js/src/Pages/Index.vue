@@ -53,7 +53,10 @@ defineProps({
             class="btn btn-primary"
             >Documentação</a
           >
-          <a href="https://github.com" target="_blank" class="btn btn-outline"
+          <a
+            href="https://github.com/JoaoHCSilva/Automa-o-Node"
+            target="_blank"
+            class="btn btn-outline"
             >GitHub</a
           >
         </div>
@@ -113,10 +116,8 @@ defineProps({
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-x: hidden;
 }
 
-/* Hero */
 .hero {
   position: relative;
   width: 100%;
@@ -178,7 +179,6 @@ defineProps({
   line-height: 1.6;
   margin: 0 0 2.5rem;
 }
-
 .hero-actions {
   display: flex;
   gap: 1rem;
@@ -193,7 +193,6 @@ defineProps({
   font-weight: 600;
   text-decoration: none;
   transition: all 0.2s ease;
-  cursor: pointer;
 }
 
 .btn-primary {
@@ -202,31 +201,27 @@ defineProps({
   border: none;
   box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
 }
-
 .btn-primary:hover {
   box-shadow: 0 6px 24px rgba(249, 115, 22, 0.5);
   transform: translateY(-1px);
 }
-
 .btn-outline {
   background: transparent;
   color: #d4d4d4;
   border: 1px solid #333;
 }
-
 .btn-outline:hover {
   border-color: #555;
   background: rgba(255, 255, 255, 0.04);
 }
 
-/* Features */
 .features {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.25rem;
   max-width: 900px;
   width: 100%;
-  padding: 2rem;
+  padding: 0 2rem 2rem;
   animation: fadeUp 0.8s ease-out 0.2s both;
 }
 
@@ -237,25 +232,21 @@ defineProps({
   padding: 2rem 1.5rem;
   transition: all 0.3s ease;
 }
-
 .feature-card:hover {
   border-color: #333;
   background: #1a1a1a;
   transform: translateY(-2px);
 }
-
 .feature-icon {
   font-size: 1.75rem;
   margin-bottom: 0.75rem;
 }
-
 .feature-card h3 {
   font-size: 1rem;
   font-weight: 700;
   color: #f5f5f5;
   margin: 0 0 0.5rem;
 }
-
 .feature-card p {
   font-size: 0.8125rem;
   color: #737373;
@@ -263,20 +254,17 @@ defineProps({
   margin: 0;
 }
 
-/* Footer */
 .welcome-footer {
   margin-top: auto;
   padding: 2rem;
   text-align: center;
 }
-
 .welcome-footer p {
   font-size: 0.75rem;
   color: #404040;
   margin: 0;
 }
 
-/* Animations */
 @keyframes fadeUp {
   from {
     opacity: 0;
@@ -287,7 +275,6 @@ defineProps({
     transform: translateY(0);
   }
 }
-
 @keyframes float {
   0%,
   100% {

@@ -1,10 +1,12 @@
-<script setup lang="ts">
+<script setup>
 import { Head } from "@inertiajs/vue3";
-import type { IndexPageProps } from "../types";
 
-withDefaults(defineProps<IndexPageProps>(), {
-  titulo: "Minha App",
-  descricao: "Aplicação fullstack com Express + Inertia.js",
+defineProps({
+  titulo: { type: String, default: "Minha App" },
+  descricao: {
+    type: String,
+    default: "Aplicação fullstack com Express + Inertia.js",
+  },
 });
 </script>
 
@@ -12,6 +14,7 @@ withDefaults(defineProps<IndexPageProps>(), {
   <Head title="Bem-vindo" />
 
   <div class="welcome-page">
+    <!-- Hero -->
     <section class="hero">
       <div class="hero-glow"></div>
       <div class="hero-content">
@@ -50,13 +53,17 @@ withDefaults(defineProps<IndexPageProps>(), {
             class="btn btn-primary"
             >Documentação</a
           >
-          <a href="https://github.com" target="_blank" class="btn btn-outline"
+          <a
+            href="https://github.com/JoaoHCSilva/Automa-o-Node"
+            target="_blank"
+            class="btn btn-outline"
             >GitHub</a
           >
         </div>
       </div>
     </section>
 
+    <!-- Features -->
     <section class="features">
       <div class="feature-card">
         <div class="feature-icon">⚡</div>
@@ -88,6 +95,7 @@ withDefaults(defineProps<IndexPageProps>(), {
       </div>
     </section>
 
+    <!-- Footer -->
     <footer class="welcome-footer">
       <p>Express + Inertia.js + Vue 3 · v1.0.0</p>
     </footer>
@@ -108,7 +116,6 @@ withDefaults(defineProps<IndexPageProps>(), {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-x: hidden;
 }
 
 .hero {
@@ -172,7 +179,6 @@ withDefaults(defineProps<IndexPageProps>(), {
   line-height: 1.6;
   margin: 0 0 2.5rem;
 }
-
 .hero-actions {
   display: flex;
   gap: 1rem;
@@ -195,12 +201,10 @@ withDefaults(defineProps<IndexPageProps>(), {
   border: none;
   box-shadow: 0 4px 16px rgba(249, 115, 22, 0.3);
 }
-
 .btn-primary:hover {
   box-shadow: 0 6px 24px rgba(249, 115, 22, 0.5);
   transform: translateY(-1px);
 }
-
 .btn-outline {
   background: transparent;
   color: #d4d4d4;
@@ -217,7 +221,7 @@ withDefaults(defineProps<IndexPageProps>(), {
   gap: 1.25rem;
   max-width: 900px;
   width: 100%;
-  padding: 2rem;
+  padding: 0 2rem 2rem;
   animation: fadeUp 0.8s ease-out 0.2s both;
 }
 
@@ -228,7 +232,6 @@ withDefaults(defineProps<IndexPageProps>(), {
   padding: 2rem 1.5rem;
   transition: all 0.3s ease;
 }
-
 .feature-card:hover {
   border-color: #333;
   background: #1a1a1a;
