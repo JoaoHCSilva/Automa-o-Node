@@ -10,9 +10,10 @@ function installDependencies {
     Write-Host "Instalando dependecias..." -ForegroundColor white
 
     # Normaliza nome do template para o pacote Inertia correto
-    if($template -eq "react" -or $template -eq "react-ts"){
+    if ($template -eq "react" -or $template -eq "react-ts") {
         $template = "react"
-    } elseif($template -eq "vue" -or $template -eq "vue-ts"){
+    }
+    elseif ($template -eq "vue" -or $template -eq "vue-ts") {
         $template = "vue"
     }
     

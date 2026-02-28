@@ -18,6 +18,7 @@ Import-Module "$scriptDir\module\templateModule.psm1" -Force
 Import-Module "$scriptDir\module\packageScriptsModule.psm1" -Force
 Import-Module "$scriptDir\module\templates\viewTemplate.psm1" -Force
 Import-Module "$scriptDir\module\templates\typesTemplate.psm1" -Force
+Import-Module "$scriptDir\module\templates\vueInertiaTemplate.psm1" -Force
 
 function Test-Prerequisites {
     Write-Host "Verificando pré-requisitos..." -ForegroundColor Cyan
@@ -63,7 +64,8 @@ function Remove-ProjectOnError {
         try {
             Remove-Item -Path $path -Recurse -Force -ErrorAction Stop
             Write-Host "[OK] Projeto removido com sucesso." -ForegroundColor Green
-        } catch {
+        }
+        catch {
             Write-Host "[AVISO] Não foi possível remover automaticamente: $path" -ForegroundColor Yellow
             Write-Host "Por favor, remova manualmente." -ForegroundColor Yellow
         }
@@ -124,12 +126,14 @@ function criarPastas() {
             try {
                 New-Item -Path $caminho -ItemType Directory -Force | Out-Null
                 Write-Host "[OK] Caminho criado com sucesso!" -ForegroundColor Green
-            } catch {
+            }
+            catch {
                 Write-Host "[ERRO] Não foi possível criar o caminho: $_" -ForegroundColor Red
                 Read-Host "Pressione Enter para sair"
                 return
             }
-        } else {
+        }
+        else {
             Write-Host "Operação cancelada pelo usuário." -ForegroundColor Yellow
             Read-Host "Pressione Enter para sair"
             return
@@ -150,7 +154,8 @@ function criarPastas() {
     try {
         New-Item -Path $caminho -Name $nomeProjeto -ItemType Directory -ErrorAction Stop | Out-Null
         Write-Host "Projeto criado em: $caminhoCompleto" -ForegroundColor Green
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Falha ao criar pasta do projeto: $_" -ForegroundColor Red
         Read-Host "Pressione Enter para sair"
         return
@@ -163,7 +168,8 @@ function criarPastas() {
             New-Item -Path "$caminho\$nomeProjeto" -Name "$pasta" -ItemType Directory -ErrorAction Stop | Out-Null 
             Write-Host "- $pasta" -ForegroundColor White
         }
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Falha ao criar subpastas: $_" -ForegroundColor Red
         Remove-ProjectOnError -path $caminhoCompleto
         Read-Host "Pressione Enter para sair"
@@ -173,7 +179,8 @@ function criarPastas() {
     # cria as subpastas de views
     try {
         viewTemplate -caminho "$caminho\$nomeProjeto"
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Falha ao criar subpastas de views: $_" -ForegroundColor Red
         Remove-ProjectOnError -path $caminhoCompleto
         Read-Host "Pressione Enter para sair"
@@ -184,7 +191,8 @@ function criarPastas() {
     # Navega para o caminho de instalacao
     try {
         Set-Location -Path "$caminho\$nomeProjeto" -ErrorAction Stop
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Não foi possível navegar para o diretório do projeto: $_" -ForegroundColor Red
         Remove-ProjectOnError -path $caminhoCompleto
         Read-Host "Pressione Enter para sair"
@@ -203,7 +211,8 @@ function criarPastas() {
     # adiciona os arquivos na pasta do projeto
     try {
         adicionarFiles -caminho $caminho -nomeProjeto $nomeProjeto -nomeArquiApp $nomeArquiApp -extensao $extensaoEscolhida
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Falha ao criar arquivos principais: $_" -ForegroundColor Red
         Set-Location $caminho
         Remove-ProjectOnError -path $caminhoCompleto
@@ -228,7 +237,7 @@ coverage/
     Write-Host "Criado .gitignore" -ForegroundColor Green
     
     # cria os types e templates que são utilizados com typeScropt
-    if($extensoes -eq "ts"){
+    if ($extensoes -eq "ts") {
         typesTemplate "$caminho\$nomeProjeto"
     }
 
@@ -258,18 +267,30 @@ coverage/
     try {
         instalarVite $nomeProjeto $templateEscolhido
         Write-Host "Instalado Vite com sucesso!" -ForegroundColor Green
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Falha ao instalar Vite: $_" -ForegroundColor Red
         Set-Location $caminho
         Remove-ProjectOnError -path $caminhoCompleto
         Read-Host "Pressione Enter para sair"
         return
     }
+
+    # Copia skeleton Vue + Inertia.js quando o template for vue ou vue-ts
+    if ($templateEscolhido -eq "vue" -or $templateEscolhido -eq "vue-ts") {
+        try {
+            Copy-VueSkeleton -caminho $caminhoCompleto -template $templateEscolhido
+        }
+        catch {
+            Write-Host "[AVISO] Falha ao copiar skeleton Vue/Inertia: $_" -ForegroundColor Yellow
+        }
+    }
     
     # instala as dependecias do projeto
     try {
         installDependencies
-    } catch {
+    }
+    catch {
         Write-Host "[ERRO] Falha ao instalar dependências: $_" -ForegroundColor Red
         Write-Host "[INFO] Você pode instalar manualmente com: npm install" -ForegroundColor Yellow
     }
@@ -278,7 +299,8 @@ coverage/
     try {
         Write-Host "`nConfigurando scripts do package.json..." -ForegroundColor Cyan
         Add-BackendScripts -caminho (Get-Location) -extensao $extensaoEscolhida
-    } catch {
+    }
+    catch {
         Write-Host "[AVISO] Não foi possível configurar scripts automaticamente: $_" -ForegroundColor Yellow
     }
     
