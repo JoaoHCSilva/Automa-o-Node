@@ -1,8 +1,23 @@
 // inertiaMiddleware.js — Middleware Inertia.js simplificado para Express
 // Implementa o protocolo Inertia sem depender de pacotes externos
 
+import { existsSync } from 'fs';
+import { join } from 'path';
+
 const VITE_PORT = process.env.VITE_PORT || 5173;
 const isDev = process.env.NODE_ENV !== 'production';
+
+// Detecta automaticamente o entry point (jsx, tsx, js, ts)
+function detectEntry() {
+    const exts = ['jsx', 'tsx', 'js', 'ts'];
+    for (const ext of exts) {
+        if (existsSync(join(process.cwd(), `src/main.${ext}`))) {
+            return `src/main.${ext}`;
+        }
+    }
+    return 'src/main.js';
+}
+const ENTRY_FILE = detectEntry();
 
 // Gera o HTML shell com data-page para o Inertia
 function generateHtml(page) {
@@ -10,7 +25,7 @@ function generateHtml(page) {
 
     const scripts = isDev
         ? `<script type="module" src="http://localhost:${VITE_PORT}/@vite/client"></script>
-           <script type="module" src="http://localhost:${VITE_PORT}/src/main.js"></script>`
+           <script type="module" src="http://localhost:${VITE_PORT}/${ENTRY_FILE}"></script>`
         : `<script type="module" src="/assets/main.js"></script>
            <link rel="stylesheet" href="/assets/main.css">`;
 
@@ -42,13 +57,11 @@ export function inertiaMiddleware(req, res, next) {
             };
 
             if (isInertiaRequest) {
-                // Requisição Inertia (navegação SPA): retorna JSON
                 res.setHeader('X-Inertia', 'true');
                 res.setHeader('Vary', 'X-Inertia');
                 return res.json(page);
             }
 
-            // Primeira visita: retorna HTML completo com data-page
             res.type('html').send(generateHtml(page));
         }
     };

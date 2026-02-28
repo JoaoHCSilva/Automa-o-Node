@@ -2,6 +2,8 @@
 // Implementa o protocolo Inertia sem depender de pacotes externos
 
 import type { Request, Response, NextFunction } from "express";
+import { existsSync } from "fs";
+import { join } from "path";
 
 interface InertiaRenderOptions {
     component: string;
@@ -11,13 +13,25 @@ interface InertiaRenderOptions {
 const VITE_PORT = process.env.VITE_PORT || 5173;
 const isDev = process.env.NODE_ENV !== 'production';
 
+// Detecta automaticamente o entry point (tsx, jsx, ts, js)
+function detectEntry(): string {
+    const exts = ['tsx', 'jsx', 'ts', 'js'];
+    for (const ext of exts) {
+        if (existsSync(join(process.cwd(), `src/main.${ext}`))) {
+            return `src/main.${ext}`;
+        }
+    }
+    return 'src/main.ts';
+}
+const ENTRY_FILE = detectEntry();
+
 // Gera o HTML shell com data-page para o Inertia
 function generateHtml(page: Record<string, unknown>): string {
     const pageJson = JSON.stringify(page).replace(/'/g, '&#039;');
 
     const scripts = isDev
         ? `<script type="module" src="http://localhost:${VITE_PORT}/@vite/client"></script>
-           <script type="module" src="http://localhost:${VITE_PORT}/src/main.ts"></script>`
+           <script type="module" src="http://localhost:${VITE_PORT}/${ENTRY_FILE}"></script>`
         : `<script type="module" src="/assets/main.js"></script>
            <link rel="stylesheet" href="/assets/main.css">`;
 
