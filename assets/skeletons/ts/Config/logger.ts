@@ -28,32 +28,32 @@ const consoleFormat = winston.format.combine(
     })
 );
 
-// Cria instância do logger com múltiplos transportes
+// Cria instância do logger — console sempre ativo para feedback rápido
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
     format: customFormat,
     defaultMeta: { service: 'api' },
     transports: [
-        // Arquivo exclusivo para erros — facilita debug em produção
-        new winston.transports.File({
-            filename: path.join(logsDir, 'error.log'),
-            level: 'error',
-            maxsize: 5242880, // Rotação a cada 5MB
-            maxFiles: 5,
-        }),
-        // Arquivo com todos os logs combinados
-        new winston.transports.File({
-            filename: path.join(logsDir, 'combined.log'),
-            maxsize: 5242880,
-            maxFiles: 5,
+        // Console sempre ativo — formato colorido em dev, JSON em prod
+        new winston.transports.Console({
+            format: process.env.NODE_ENV === 'production' ? customFormat : consoleFormat,
         }),
     ],
 });
 
-// Em desenvolvimento, exibe logs no terminal para feedback rápido
-if (process.env.NODE_ENV !== 'production') {
-    logger.add(new winston.transports.Console({
-        format: consoleFormat,
+// Em produção, adiciona logs em arquivo para persistência e auditoria
+// NÃO ativa em dev porque node --watch detecta mudanças em logs/ e causa restart loop
+if (process.env.NODE_ENV === 'production') {
+    logger.add(new winston.transports.File({
+        filename: path.join(logsDir, 'error.log'),
+        level: 'error',
+        maxsize: 5242880,
+        maxFiles: 5,
+    }));
+    logger.add(new winston.transports.File({
+        filename: path.join(logsDir, 'combined.log'),
+        maxsize: 5242880,
+        maxFiles: 5,
     }));
 }
 

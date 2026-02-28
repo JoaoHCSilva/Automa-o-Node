@@ -42,11 +42,12 @@ function Add-BackendScripts {
         
         # Define scripts baseados na extensão
         # tsx: compilação instantânea via esbuild (substitui ts-node)
-        # node --watch: hot-reload nativo do Node 22+ (substitui nodemon)
+        # node --watch: hot-reload nativo do Node 22+ (monitora apenas arquivos importados)
         if ($extensao -eq "ts") {
             $serverScript = "tsx app.ts"
-            $devBackendScript = "node --watch --import tsx app.ts"
-        } else {
+            $devBackendScript = "tsx watch app.ts"
+        }
+        else {
             $serverScript = "node app.js"
             $devBackendScript = "node --watch app.js"
         }
@@ -59,14 +60,17 @@ function Add-BackendScripts {
         # Preserva scripts do Vite e adiciona scripts de backend
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "server" -Value $serverScript -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:backend" -Value $devBackendScript -Force
-        $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:frontend" -Value ($packageJson.scripts.dev ?? "vite") -Force
+        $devFrontendScript = if ($packageJson.scripts.dev) { $packageJson.scripts.dev } else { "vite" }
+        $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:frontend" -Value $devFrontendScript -Force
         
         # Script fullstack: roda frontend e backend simultaneamente (requer concurrently)
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:fullstack" -Value "concurrently `"npm run dev:backend`" `"npm run dev:frontend`"" -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "start" -Value $serverScript -Force
         
-        # Salva o package.json atualizado
-        $packageJson | ConvertTo-Json -Depth 10 | Set-Content $packageJsonPath -Encoding UTF8
+        # Salva com UTF-8 SEM BOM (Set-Content -Encoding UTF8 no PS 5.1 adiciona BOM que corrompe JSON)
+        $jsonString = $packageJson | ConvertTo-Json -Depth 10
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($packageJsonPath, $jsonString, $utf8NoBom)
         
         Write-Host "  [OK] Scripts adicionados ao package.json:" -ForegroundColor Green
         Write-Host "    - server: $serverScript" -ForegroundColor Gray

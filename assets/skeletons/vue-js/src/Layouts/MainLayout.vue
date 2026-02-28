@@ -1,0 +1,93 @@
+<script setup>
+// MainLayout.vue — Layout persistente da aplicação
+// Mantém o menu de navegação entre transições de página
+
+import { Link } from "@inertiajs/vue3";
+</script>
+
+<template>
+  <div class="app-layout">
+    <header class="app-header">
+      <nav class="app-nav">
+        <div class="nav-brand">
+          <Link href="/" class="brand-link">Minha App</Link>
+        </div>
+        <ul class="nav-links">
+          <li>
+            <Link href="/" class="nav-link">Home</Link>
+          </li>
+          <li>
+            <Link href="/about" class="nav-link">Sobre</Link>
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <main class="app-content">
+      <slot />
+    </main>
+  </div>
+</template>
+
+<style scoped>
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0a0a0a;
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #1f1f1f;
+  padding: 0 2rem;
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 56px;
+}
+
+.brand-link {
+  color: #f97316;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link {
+  color: #a3a3a3;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.nav-link:hover {
+  color: #f5f5f5;
+}
+
+.app-content {
+  flex: 1;
+  padding-top: 56px; /* Compensa o header fixo */
+}
+</style>

@@ -3,12 +3,13 @@
 
 import express from "express";
 import session from "express-session";
-import inertia from "express-inertia";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
 import rateLimit from "express-rate-limit";
 import routes from "./Routes/router.ts";
 import { errorHandler } from "./Middleware/middlewares.ts";
+import { inertiaMiddleware } from "./Middleware/inertiaMiddleware.ts";
 import logger, { requestLogger } from "./Config/logger.ts";
 
 // Carrega variáveis de ambiente do arquivo .env
@@ -37,20 +38,22 @@ app.use(limiter);
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(requestLogger); // Logger de requisições HTTP
+app.use(requestLogger);
 
-// Sessão necessária para flash messages e estado do Inertia
+// Em produção, serve arquivos compilados pelo Vite
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(process.cwd(), 'dist')));
+}
+
+// Sessão necessária para flash messages
 app.use(session({
-  secret: 'sua_chave_secreta',
-  resave: false,
-  saveUninitialized: false,
+    secret: process.env.SESSION_SECRET || 'sua_chave_secreta',
+    resave: false,
+    saveUninitialized: false,
 }));
 
-// Integração com Inertia.js para SSR/CSR híbrido
-app.use(await inertia({
-  rootElementId: 'app',
-  assetsVersion: 'v1',
-}));
+// Middleware Inertia — adiciona res.inertia.render() às rotas
+app.use(inertiaMiddleware);
 
 // Monta todas as rotas da aplicação
 app.use(routes);
@@ -63,7 +66,7 @@ app.listen(PORT, () => {
     logger.info('========================================');
     logger.info('  Servidor rodando com sucesso!');
     logger.info('========================================');
-    logger.info('  URL: http://localhost:' + PORT);
-    logger.info('  Ambiente: ' + (process.env.NODE_ENV || 'development'));
+    logger.info(`  URL: http://localhost:${PORT}`);
+    logger.info(`  Ambiente: ${process.env.NODE_ENV || 'development'}`);
     logger.info('========================================');
 });

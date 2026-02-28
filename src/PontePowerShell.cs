@@ -118,13 +118,15 @@ namespace TemplateNodeAppGUI
         {
             string modulePath = Path.Combine(_assetsPath, "module");
 
-            // Lista de templates Vite disponíveis (mesma ordem do main.ps1)
-            string[] templates = { "vanilla", "vanilla-ts", "vue", "vue-ts", "react", "react-ts",
-                                   "preact", "lit", "svelte", "solid", "qwik" };
+            // Frameworks: 0 = React, 1 = Vue, 2 = Vanilla (mesma ordem do index.html)
+            string[] frameworks = { "react", "vue", "vanilla" };
             string[] extensoes = { "js", "ts" };
 
-            string templateEscolhido = template >= 0 && template < templates.Length ? templates[template] : "vanilla";
+            string frameworkBase = template >= 0 && template < frameworks.Length ? frameworks[template] : "react";
             string extensaoEscolhida = linguagem >= 0 && linguagem < extensoes.Length ? extensoes[linguagem] : "js";
+
+            // Combina framework + linguagem para o template Vite (ex: "react-ts", "vue", "vanilla-ts")
+            string templateEscolhido = extensaoEscolhida == "ts" ? $"{frameworkBase}-ts" : frameworkBase;
 
 
             // Script PowerShell que replica a lógica do main.ps1 usando os parâmetros da GUI
@@ -142,6 +144,7 @@ Import-Module (Join-Path $modulePath 'dependenciasModule.psm1') -Force
 Import-Module (Join-Path $modulePath 'routesModel.psm1') -Force
 Import-Module (Join-Path $modulePath 'templateModule.psm1') -Force
 Import-Module (Join-Path $modulePath 'packageScriptsModule.psm1') -Force
+Import-Module (Join-Path $modulePath 'templates\frontendSkeletonModule.psm1') -Force
 
 $nomeProjeto = '{nomeProjeto}'
 $caminho = '{caminho}'
@@ -207,7 +210,10 @@ New-ProjectTemplates -caminho $caminhoAtual -extensao $extensaoEscolhida
 instalarVite $nomeProjeto $templateEscolhido
 Write-Host 'Vite instalado com sucesso!' -ForegroundColor Green
 
-installDependencies
+Copy-FrontendSkeleton -caminho $caminhoCompleto -template $templateEscolhido
+Write-Host 'Skeleton frontend copiado!' -ForegroundColor Green
+
+installDependencies -template $templateEscolhido
 Write-Host 'Dependencias instaladas!' -ForegroundColor Green
 
 Add-BackendScripts -caminho (Get-Location) -extensao $extensaoEscolhida
@@ -218,7 +224,7 @@ Write-Host ""  Projeto $nomeProjeto criado com sucesso!""
 Write-Host '========================================'
 Write-Host ""Localizacao: $caminhoCompleto""
 Write-Host ""Linguagem: $extensaoEscolhida""
-Write-Host ""Template: $templateEscolhido""
+Write-Host ""Framework: $templateEscolhido""
 ";
         }
     }
