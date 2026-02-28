@@ -67,8 +67,10 @@ function Add-BackendScripts {
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "dev:fullstack" -Value "concurrently `"npm run dev:backend`" `"npm run dev:frontend`"" -Force
         $packageJson.scripts | Add-Member -MemberType NoteProperty -Name "start" -Value $serverScript -Force
         
-        # Salva o package.json atualizado
-        $packageJson | ConvertTo-Json -Depth 10 | Set-Content $packageJsonPath -Encoding UTF8
+        # Salva com UTF-8 SEM BOM (Set-Content -Encoding UTF8 no PS 5.1 adiciona BOM que corrompe JSON)
+        $jsonString = $packageJson | ConvertTo-Json -Depth 10
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($packageJsonPath, $jsonString, $utf8NoBom)
         
         Write-Host "  [OK] Scripts adicionados ao package.json:" -ForegroundColor Green
         Write-Host "    - server: $serverScript" -ForegroundColor Gray
