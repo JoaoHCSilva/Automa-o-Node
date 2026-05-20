@@ -21,12 +21,12 @@ function installDependencies {
     switch ($frameworkBase) {
         "react" {
             $depProducao += "express-session"
-            $depDesenvolvimento += @("@inertiajs/react", "@types/express-session")
+            $depDesenvolvimento += @("@inertiajs/react@^1.0.0", "@types/express-session")
             Write-Host "  Framework: React + Inertia.js" -ForegroundColor Cyan
         }
         "vue" {
             $depProducao += "express-session"
-            $depDesenvolvimento += @("@inertiajs/vue3", "@types/express-session")
+            $depDesenvolvimento += @("@inertiajs/vue3@^1.0.0", "@types/express-session")
             Write-Host "  Framework: Vue 3 + Inertia.js" -ForegroundColor Cyan
         }
         "vanilla" {
