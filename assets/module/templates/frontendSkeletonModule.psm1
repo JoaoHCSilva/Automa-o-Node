@@ -59,9 +59,9 @@ function Copy-FrontendSkeleton {
     $isVanilla = $template -like "vanilla*"
 
     if ($isVanilla) {
-        # Vanilla: skeleton tem arquivos na raiz, copia direto para o projeto
+        # Vanilla: skeleton tem arquivos na raiz, mas Vite espera tudo em src/
         $skeletonSrc = $skeletonPath
-        $destBase = $caminho
+        $destBase = Join-Path $caminho "src"
     }
     else {
         # React/Vue: skeleton tem arquivos em src/, copia para src/ do projeto
@@ -120,24 +120,23 @@ function Copy-FrontendSkeleton {
     # Remove arquivos desnecessários do Vite default
     $arquivosRemover = @()
 
-    # Remove o index.html do Vite (Inertia gera o HTML via Express middleware)
-    $viteIndexHtml = Join-Path $caminho "index.html"
-    if (Test-Path $viteIndexHtml) {
-        Remove-Item -Path $viteIndexHtml -Force
-        Write-Host "  [REMOVIDO] index.html (Inertia usa HTML gerado pelo Express)" -ForegroundColor DarkGray
-    }
-
     if ($isVanilla) {
-        # Vanilla: remove o counter.js e javascript.svg padrão do Vite
+        # Vanilla: mantém o index.html (Vite serve o app diretamente)
+        # Remove arquivos de exemplo do Vite dentro de src/
+        $srcPath = Join-Path $caminho "src"
         $arquivosRemover = @(
-            (Join-Path $caminho "counter.js"),
-            (Join-Path $caminho "counter.ts"),
-            (Join-Path $caminho "javascript.svg"),
-            (Join-Path $caminho "typescript.svg")
+            (Join-Path $srcPath "counter.js"),
+            (Join-Path $srcPath "counter.ts"),
+            (Join-Path $srcPath "javascript.svg"),
+            (Join-Path $srcPath "typescript.svg")
         )
     }
     else {
-        # React/Vue: remove componentes de exemplo do Vite
+        # Inertia (React/Vue): mantém o index.html gerado pelo Vite.
+        # O Express gera o HTML de resposta via inertiaMiddleware, mas o Vite
+        # precisa do index.html como entry point para o comando "vite build".
+
+        # Remove componentes de exemplo do Vite
         $srcPath = Join-Path $caminho "src"
         $arquivosRemover = @(
             (Join-Path $srcPath "App.vue"),
