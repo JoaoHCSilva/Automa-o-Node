@@ -1,15 +1,27 @@
 #Requires -Version 7.0
 # test-frontend-skeletons.ps1 — Valida que cada skeleton frontend compila sem erros
 #
-# Uso:
+# Uso (a partir da raiz do projeto):
 #   .\tests\test-frontend-skeletons.ps1
-#   .\tests\test-frontend-skeletons.ps1 -Templates react,react-ts
-#   .\tests\test-frontend-skeletons.ps1 -Templates vanilla-ts
+#   .\tests\test-frontend-skeletons.ps1 -Templates react
+#   .\tests\test-frontend-skeletons.ps1 -Templates vue,vue-ts
 
 param(
-    [ValidateSet("react", "react-ts", "vue", "vue-ts", "vanilla", "vanilla-ts")]
+    # Aceita um ou vários templates. Via -File: -Templates react  ou  -Templates react,react-ts
+    # Via -Command: & '.\tests\test-frontend-skeletons.ps1' -Templates 'vue','vue-ts'
     [string[]]$Templates = @("react", "react-ts", "vue", "vue-ts", "vanilla", "vanilla-ts")
 )
+
+# Expande eventuais entradas com vírgula (ex: "vue,vue-ts" passado como string única)
+$Templates = $Templates | ForEach-Object { $_ -split "," } | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+
+$templateValidos = @("react", "react-ts", "vue", "vue-ts", "vanilla", "vanilla-ts")
+foreach ($t in $Templates) {
+    if ($t -notin $templateValidos) {
+        Write-Error "Template inválido: '$t'. Válidos: $($templateValidos -join ', ')"
+        exit 1
+    }
+}
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -32,10 +44,10 @@ $viteTemplateMap = @{
 # Dependências extras necessárias para o build (além das do Vite)
 # Inertia precisa estar presente para o TypeScript resolver os tipos na compilação
 $extraDeps = @{
-    "react"      = @("@inertiajs/react")
-    "react-ts"   = @("@inertiajs/react")
-    "vue"        = @("@inertiajs/vue3")
-    "vue-ts"     = @("@inertiajs/vue3")
+    "react"      = @("@inertiajs/react@^1.0.0")
+    "react-ts"   = @("@inertiajs/react@^1.0.0")
+    "vue"        = @("@inertiajs/vue3@^1.0.0")
+    "vue-ts"     = @("@inertiajs/vue3@^1.0.0")
     "vanilla"    = @()
     "vanilla-ts" = @()
 }

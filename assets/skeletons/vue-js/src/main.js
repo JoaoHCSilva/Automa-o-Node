@@ -42,10 +42,10 @@ createInertiaApp({
     // Aplica layout padrão se a página não definir um próprio
     page.default.layout = page.default.layout || MainLayout;
 
-    return page;
+    return page.default;
   },
   setup({ el, App, props, plugin }) {
-    createApp({ render: () => h(App, props) })
+    return createApp({ render: () => h(App, props) })
       .use(plugin)
       .mount(el);
   },

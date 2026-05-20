@@ -42,7 +42,7 @@ createInertiaApp({
     page.default.layout =
       page.default.layout || ((page) => <MainLayout>{page}</MainLayout>);
 
-    return page;
+    return page.default;
   },
   setup({ el, App, props }) {
     createRoot(el).render(<App {...props} />);
